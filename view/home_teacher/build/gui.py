@@ -3,7 +3,7 @@ from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel
 # from view.home.manage_students.add_student.build.gui import add_Student_Window
 # from view.home.manage_students.view_students.build.gui import view_Students_Window
 from view.home_teacher.mark_student_attendance.build.gui import markStd_Attendance
-
+from view.home_teacher.approve_fee.build.gui import approveStd_Fee
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./assets")
@@ -18,6 +18,9 @@ class Tch_Dashboard(Toplevel):
 
     def open_mark_std_atten(self):
         markStd_Attendance(self.teacher_id)
+
+    def open_approve_std_fee(self):
+        approveStd_Fee(self.teacher_id)
 
     def __init__(self, teacher_id,*args, **kwargs):
 
@@ -144,7 +147,7 @@ class Tch_Dashboard(Toplevel):
             image=button_image_5,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("sad"),
+            command=lambda: self.open_approve_std_fee(),
             relief="flat"
         )
         button_5.place(

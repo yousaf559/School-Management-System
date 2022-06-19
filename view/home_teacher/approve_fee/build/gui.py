@@ -15,10 +15,10 @@ ASSETS_PATH = OUTPUT_PATH / Path("./assets")
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-def markStd_Attendance(teacher_id):
-    Mark_Std_Atten(teacher_id)
+def approveStd_Fee(teacher_id):
+    Approve_Std_Fee(teacher_id)
 
-class Mark_Std_Atten(Toplevel):
+class Approve_Std_Fee(Toplevel):
 
     def __init__(self, teacher_id, *args, **kwargs):
         self.teacher_id = teacher_id
@@ -88,7 +88,7 @@ class Mark_Std_Atten(Toplevel):
             297.0,
             30.0,
             anchor="nw",
-            text="Student List",
+            text="Student Fee List",
             fill="#000000",
             font=("Inter", 36 * -1)
         )
@@ -112,39 +112,22 @@ class Mark_Std_Atten(Toplevel):
 
         button_image_4 = PhotoImage(
             file=relative_to_assets("button_4.png"))
-        self.present_btn = Button(
+        self.approve_btn = Button(
             self.canvas,
             image=button_image_4,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: self.mark_attendance('present'),
+            command=lambda: self.approve_fee(),
             relief="flat",
             state="disabled"
         )
-        self.present_btn.place(
-            x=254.0,
+        self.approve_btn.place(
+            x=300.0,
             y=462.0,
             width=116.0,
             height=48.0
         )
 
-        button_image_5 = PhotoImage(
-            file=relative_to_assets("button_3.png"))
-        self.absent_btn = Button(
-            self.canvas,
-            image=button_image_5,
-            borderwidth=0,
-            highlightthickness=0,
-            command=lambda: self.mark_attendance('absent'),
-            relief="flat",
-            state="disabled",
-        )
-        self.absent_btn.place(
-            x=380.0,
-            y=462.0,
-            width=116.0,
-            height=48.0
-        )
 
         self.canvas.create_rectangle(
             28.0,
@@ -173,7 +156,7 @@ class Mark_Std_Atten(Toplevel):
             # font=("Montserrat Bold", 18 * -1)
         )
         self.treeview.tag_configure("present", background="green", foreground="white")
-        self.treeview.tag_configure("absent", background="red", foreground="white")
+        self.treeview.tag_configure("default", background="red", foreground="white")
         #self.treeview.tag_configure("Default", background="white", foreground="black")
 
         # Show the headings
@@ -201,8 +184,7 @@ class Mark_Std_Atten(Toplevel):
             self.selected_item = self.treeview.selection()[0]
             # Get the id
             self.selected_rid = self.treeview.item(self.selected_item, "values")[0]
-            self.present_btn.config(state="normal")
-            self.absent_btn.config(state="normal")
+            self.approve_btn.config(state="normal")
 
     def insert_students_data(self):
         self.treeview.delete(*self.treeview.get_children())
@@ -215,40 +197,34 @@ class Mark_Std_Atten(Toplevel):
         )
         mycursor = mydb.cursor()
 
-        sql = "SELECT * FROM students WHERE student_id IN (SELECT student_id FROM Student_Br_Teacher WHERE teacher_id= " +str(self.teacher_id)+ ")"
-        mycursor.execute(sql)
+        sql = "SELECT students.*, transactions.transaction_id FROM students LEFT JOIN transactions ON students.student_id = transactions.student_id AND YEAR(transactions.transaction_date) = YEAR(CURRENT_DATE) WHERE students.student_id IN (SELECT student_id FROM Student_Br_Teacher WHERE teacher_id=%s);"
+        mycursor.execute(sql, [str(self.teacher_id)])
         result = mycursor.fetchall()
         for row in result:
-            #self.treeview.insert("", "end", values=row)
-            self.treeview.insert("", "end", values=row)
+            if row[6]:
+                self.treeview.insert("", "end", values=row, tags=['present'])
+            else:
+                self.treeview.insert("", "end", values=row, tags=['default'])
+
         mydb.close()
 
-    def mark_attendance(self, present):
+    def approve_fee(self):
+
         mydb = mysql.connector.connect(
-        host="localhost",
-        user="admin",
-        password="admin12",
-        database="sms"
+            host="localhost",
+            user="admin",
+            password="admin12",
+            database="sms"
         )
         mycursor = mydb.cursor()
-        # check if record exists
-        record_present = "SELECT * FROM std_attendance WHERE student_id = %s AND date = %s"
-        mycursor.execute(record_present, [self.selected_rid, date.today()])
-        student_attendance = mycursor.fetchall()
-        if len(student_attendance) > 0:
-            sql2 = "UPDATE std_attendance SET status = %s WHERE student_id = %s AND date = %s"
-            param_list = list()
-            param_list.append(present)
-            param_list.append(self.selected_rid)
-            param_list.append(date.today()) 
-            mycursor.execute(sql2, param_list)
-            mydb.commit()
-        else:
-            query = "INSERT INTO std_attendance (student_id, date, status) VALUES (%s, %s, %s)"
+
+        record_present = "SELECT * FROM transactions WHERE student_id = %s AND YEAR(transaction_date) = YEAR(CURRENT_DATE)"
+        mycursor.execute(record_present, [self.selected_rid])
+        student_fee = mycursor.fetchall()
+        if len(student_fee) == 0:
+            query = "INSERT INTO transactions (transaction_date, type, amount, description, student_id) VALUES (CURRENT_DATE, 'Fee', 12500, '', %s)"
             param_list = list()
             param_list.append(self.selected_rid)
-            param_list.append(date.today())
-            param_list.append(present)
             mycursor.execute(query, param_list)
             mydb.commit()
-        self.treeview.item(self.selected_item, tags=[present])
+        self.treeview.item(self.selected_item, tags=["present"])
