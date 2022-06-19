@@ -5,7 +5,7 @@ from tkinter import Toplevel, Tk, Canvas, Entry, Text, Button, PhotoImage
 from controller.admin_controller import AdminController
 from controller.teacher_controller import TeacherController
 from view.home.gui import HomeWindowManager
-from view.teacher_home.build.gui import Teachers_HomeWindow
+from view.home_teacher.build.gui import tch_Dashboard_Window
 from utils.Constants import Constants
 
 
@@ -32,7 +32,7 @@ class Login(Toplevel):
         teacher_id = TeacherController.login(self.tch_username.get(), self.tch_password.get())
         if teacher_id:
             self.destroy()
-            Teachers_HomeWindow(teacher_id)
+            tch_Dashboard_Window(teacher_id)
             return
 
     def __init__(self, *args, **kwargs):

@@ -18,15 +18,8 @@ def view_StdAtten_Window(record_id, table_name):
 
 class View_StdAtten(Toplevel):
 
-        # FOR RETURNING TO DASHBOARD 
-    # def backToDashboard(self):
-    #     self.destroy()
-    #     #homeWindow()
-    #     self.home_manager.homeWindow()
-
     def __init__(self, record_id, table_name, *args, **kwargs):
 
-        # self.home_manager=manager
         Toplevel.__init__(self, *args, **kwargs)
         self.selectedrid = record_id
         self.table_name = table_name
@@ -59,10 +52,10 @@ class View_StdAtten(Toplevel):
             fill="#AFAEF0",
             outline="")
 
-        cal=Calendar(self.canvas, selectmode='day')
-        cal.tag_config('present', background='green', foreground='white')
-        cal.tag_config('absent', background='red', foreground='white')
-        cal.place(
+        self.cal=Calendar(self.canvas, selectmode='day')
+        self.cal.tag_config('present', background='green', foreground='white')
+        self.cal.tag_config('absent', background='red', foreground='white')
+        self.cal.place(
             x=100.0,
             y=100.0,
             width=600.0,
@@ -117,6 +110,39 @@ class View_StdAtten(Toplevel):
             height=46.0
         )
 
+        button_image_4 = PhotoImage(
+            file=relative_to_assets("button_4.png"))
+        self.present_btn = Button(
+            self.canvas,
+            image=button_image_4,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: self.mark_attendance('present'),
+            relief="flat"
+        )
+        self.present_btn.place(
+            x=254.0,
+            y=462.0,
+            width=116.0,
+            height=48.0
+        )
+        button_image_5 = PhotoImage(
+            file=relative_to_assets("button_3.png"))
+        self.absent_btn = Button(
+            self.canvas,
+            image=button_image_5,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: self.mark_attendance('absent'),
+            relief="flat"
+        )
+        self.absent_btn.place(
+            x=380.0,
+            y=462.0,
+            width=116.0,
+            height=48.0
+        )
+
         self.canvas.create_rectangle(
             28.0,
             16.0,
@@ -125,67 +151,63 @@ class View_StdAtten(Toplevel):
             fill="#D9D9D9",
             outline="")
 
+        self.add_color()
+        self.resizable(False, False)
+        self.mainloop()
+
+    def add_color(self):
         mydb = mysql.connector.connect(
         host="localhost",
         user="admin",
         password="admin12",
         database="sms"
         )
-        
-
-        
+         
         mycursor = mydb.cursor()
         if self.table_name == 'teachers':
             self.query = "SELECT * FROM tch_attendance WHERE teacher_id = %s"
         else:
             self.query = "SELECT * FROM std_attendance WHERE student_id = %s"
-        print(self.selectedrid)
         mycursor.execute(self.query, [self.selectedrid])
         results = mycursor.fetchall()
         for result in results:
             #date=datetime.strptime(result[1],"%Y-%m-%d").date()
-            cal.calevent_create(result[1], result[2], result[2])
-        self.resizable(False, False)
+            self.cal.calevent_create(result[1], result[2], result[2])
 
+    def mark_attendance(self, attendance):
+        if self.table_name == "teachers":
+            self.db_table_name = "tch_attendance"
+            self.id_column_name = "teacher_id"
+        else:
+            self.db_table_name = "std_attendance"
+            self.id_column_name = "student_id"
 
-
-
-
-
-    #     self.columns = {
-    #         "ID": ["ID", 5],
-    #         "Name": ["Name", 100],
-    #         "Address": ["Address", 150],
-    #         "Age": ["Age", 10],
-    #         "Class": ["Class", 50],
-    #         "Phone": ["Phone", 100],
-    #     }
-
-    #     self.treeview = Treeview(
-    #         self,
-    #         columns=list(self.columns.keys()),
-    #         show="headings",
-    #         height=200,
-    #         selectmode="browse",
-    #         # ="#FFFFFF",
-    #         # fg="#5E95FF",
-    #         # font=("Montserrat Bold", 18 * -1)
-    #     )
-
-    #     # Show the headings
-    #     for idx, txt in self.columns.items():
-    #         self.treeview.heading(idx, text=txt[0])
-    #         # Set the column widths
-    #         self.treeview.column(idx, width=txt[1])
-
-    #     self.treeview.place(x=64.0, y=135.0, width=672.0, height=300.0)
-
-    #    # set data in tree
-    #     self.insert_students_data()
-    #     # Add selection event
-    #     self.treeview.bind("<<TreeviewSelect>>", self.on_treeview_select)
-
-    #     # mydb.close()
-    #     #
-    #     # #self.resizable(False, False)
-        self.mainloop()
+        mydb = mysql.connector.connect(
+        host="localhost",
+        user="admin",
+        password="admin12",
+        database="sms"
+        )
+         
+        mycursor = mydb.cursor()
+    
+        record_present = "SELECT * FROM "+self.db_table_name+" WHERE "+self.id_column_name+" = %s AND date = %s"
+        mycursor.execute(record_present, [self.selectedrid, datetime.strptime(self.cal.get_date(),"%m/%d/%y")])
+        student_attendance = mycursor.fetchall()
+        if len(student_attendance) > 0:
+            sql2 = "UPDATE "+self.db_table_name+" SET status = %s WHERE "+self.id_column_name+" = %s AND date = %s"
+            param_list = list()
+            param_list.append(attendance)
+            param_list.append(self.selectedrid)
+            param_list.append(datetime.strptime(self.cal.get_date(),"%m/%d/%y"))
+            mycursor.execute(sql2, param_list)
+            mydb.commit()
+        else:
+            query = "INSERT INTO "+self.db_table_name+" ("+self.id_column_name+", date, status) VALUES (%s, %s, %s)"
+            param_list = list()
+            param_list.append(self.selectedrid)
+            param_list.append(datetime.strptime(self.cal.get_date(),"%m/%d/%y"))
+            param_list.append(attendance)
+            mycursor.execute(query, param_list)
+            mydb.commit()
+        self.add_color()

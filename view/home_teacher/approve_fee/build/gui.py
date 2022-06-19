@@ -3,7 +3,6 @@ from tkinter.ttk import Treeview
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel, messagebox
 import mysql.connector
 from model import teacher
-from view.home.manage_teachers.view_teachers.edit_teacher.build.gui import edit_Teacher_Window
 from tkinter.messagebox import askyesno
 from datetime import date
 import tkinter.ttk as ttk
@@ -16,13 +15,10 @@ ASSETS_PATH = OUTPUT_PATH / Path("./assets")
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-def Teachers_HomeWindow(teacher_id):
-    Teachers_Home(teacher_id)
+def markStd_Attendance(teacher_id):
+    Mark_Std_Atten(teacher_id)
 
-class Teachers_Home(Toplevel):
-
-    def openEditTeacher(self):
-        edit_Teacher_Window(self, self.selected_rid)
+class Mark_Std_Atten(Toplevel):
 
     def __init__(self, teacher_id, *args, **kwargs):
         self.teacher_id = teacher_id
@@ -116,7 +112,7 @@ class Teachers_Home(Toplevel):
 
         button_image_4 = PhotoImage(
             file=relative_to_assets("button_4.png"))
-        self.edit_btn = Button(
+        self.present_btn = Button(
             self.canvas,
             image=button_image_4,
             borderwidth=0,
@@ -125,7 +121,7 @@ class Teachers_Home(Toplevel):
             relief="flat",
             state="disabled"
         )
-        self.edit_btn.place(
+        self.present_btn.place(
             x=254.0,
             y=462.0,
             width=116.0,
@@ -134,7 +130,7 @@ class Teachers_Home(Toplevel):
 
         button_image_5 = PhotoImage(
             file=relative_to_assets("button_3.png"))
-        self.delete_btn = Button(
+        self.absent_btn = Button(
             self.canvas,
             image=button_image_5,
             borderwidth=0,
@@ -143,7 +139,7 @@ class Teachers_Home(Toplevel):
             relief="flat",
             state="disabled",
         )
-        self.delete_btn.place(
+        self.absent_btn.place(
             x=380.0,
             y=462.0,
             width=116.0,
@@ -162,8 +158,8 @@ class Teachers_Home(Toplevel):
             "ID": ["ID", 10],
             "Name": ["Name", 100],
             "Address": ["Address", 250],
-            "Subject Taught": ["Subject Taught", 80],
-            "Phone": ["Phone", 80],
+            "Age": ["Age", 20],
+            "Class": ["Class", 10],
         }
 
         self.treeview = Treeview(
@@ -203,10 +199,10 @@ class Teachers_Home(Toplevel):
                 return
             # Get the selected item
             self.selected_item = self.treeview.selection()[0]
-            # Get the room id
+            # Get the id
             self.selected_rid = self.treeview.item(self.selected_item, "values")[0]
-            self.edit_btn.config(state="normal")
-            self.delete_btn.config(state="normal")
+            self.present_btn.config(state="normal")
+            self.absent_btn.config(state="normal")
 
     def insert_students_data(self):
         self.treeview.delete(*self.treeview.get_children())
@@ -227,33 +223,6 @@ class Teachers_Home(Toplevel):
             self.treeview.insert("", "end", values=row)
         mydb.close()
 
-    def handle_edit(self):
-        self.openEditTeacher()
-
-    def handle_refresh(self):
-       self.insert_students_data()
-
-
-    # def mark_attendance(self, present):
-    #     mydb = mysql.connector.connect(
-    #     host="localhost",
-    #     user="admin",
-    #     password="admin12",
-    #     database="sms"
-    #     )
-    #     #date = date.today()
-    #     mycursor = mydb.cursor()
-    #     query = "INSERT INTO std_attendance (student_id, date, status) VALUES (%s, %s, %s)"
-    #     param_list = list()
-    #     param_list.append(self.selected_rid)
-    #     param_list.append(date.today())
-    #     param_list.append(present)
-    #     self.treeview.item(self.selected_item, tags=[present])
-        
-
-    #     mycursor.execute(query, param_list)
-    #     mydb.commit()
-
     def mark_attendance(self, present):
         mydb = mysql.connector.connect(
         host="localhost",
@@ -261,7 +230,6 @@ class Teachers_Home(Toplevel):
         password="admin12",
         database="sms"
         )
-        #date = date.today()
         mycursor = mydb.cursor()
         # check if record exists
         record_present = "SELECT * FROM std_attendance WHERE student_id = %s AND date = %s"
@@ -284,8 +252,3 @@ class Teachers_Home(Toplevel):
             mycursor.execute(query, param_list)
             mydb.commit()
         self.treeview.item(self.selected_item, tags=[present])
-
-
-
-
-
