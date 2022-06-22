@@ -4,6 +4,7 @@ from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel, messa
 import mysql.connector
 from view.home.manage_transactions.view_transactions.edit_transaction.build.gui import edit_Trans_Window
 from tkinter.messagebox import askyesno
+import tkinter.ttk as ttk
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./assets")
@@ -30,6 +31,21 @@ class View_Trans(Toplevel):
 
         # self.home_manager=manager
         Toplevel.__init__(self, *args, **kwargs)
+
+        def fixed_map(option):
+            # Fix for setting text colour for Tkinter 8.6.9
+            # From: https://core.tcl.tk/tk/info/509cafafae
+            #
+            # Returns the style map for 'option' with any styles starting with
+            # ('!disabled', '!selected', ...) filtered out.
+
+            # style.map() returns an empty list for missing options, so this
+            # should be future-safe.
+            return [elm for elm in style.map('Treeview', query_opt=option) if
+                    elm[:2] != ('!disabled', '!selected')]
+
+        style = ttk.Style()
+        style.map('Treeview', foreground=fixed_map('foreground'), background=fixed_map('background'))
 
         self.title("School Management System")
 
@@ -118,6 +134,24 @@ class View_Trans(Toplevel):
             height=48.0
         )
 
+        approve_image = PhotoImage(
+            file=relative_to_assets("approve.png"))
+        self.approve_btn = Button(
+            self.canvas,
+            image=approve_image,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: self.transaction_action('approved'),
+            relief="flat",
+            state="disabled"
+        )
+        self.approve_btn.place(
+            x=190.0,
+            y=462.0,
+            width=50.0,
+            height=50.0
+        )
+
         button_image_5 = PhotoImage(
             file=relative_to_assets("button_3.png"))
         self.delete_btn = Button(
@@ -136,6 +170,24 @@ class View_Trans(Toplevel):
             height=48.0
         )
 
+        reject_image = PhotoImage(
+            file=relative_to_assets("reject.png"))
+        self.reject_btn = Button(
+            self.canvas,
+            image=reject_image,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: self.transaction_action('rejected'),
+            relief="flat",
+            state="disabled"
+        )
+        self.reject_btn.place(
+            x=520.0,
+            y=462.0,
+            width=50.0,
+            height=50.0
+        )
+
         self.canvas.create_rectangle(
             28.0,
             16.0,
@@ -150,6 +202,9 @@ class View_Trans(Toplevel):
             "Amount": ["Amount", 100],
             "Type": ["Type", 80],
             "Description": ["Description", 80],
+            "Teacher ID": ["Teacher ID", 80],
+            "Student ID": ["Student ID", 80],
+            "Status": ["Status", 80],        
         }
 
         self.treeview = Treeview(
@@ -162,7 +217,8 @@ class View_Trans(Toplevel):
             # fg="#5E95FF",
             # font=("Montserrat Bold", 18 * -1)
         )
-
+        self.treeview.tag_configure("approved", background="green", foreground="white")
+        self.treeview.tag_configure("rejected", background="red", foreground="white")
 
 
         # Show the headings
@@ -186,15 +242,16 @@ class View_Trans(Toplevel):
                 self.selected_rid = None
                 return
             # Get the selected item
-            item = self.treeview.selection()[0]
+            self.selected_item = self.treeview.selection()[0]
             # Get the room id
-            self.selected_rid = self.treeview.item(item, "values")[0]
+            self.selected_rid = self.treeview.item(self.selected_item, "values")[0]
             self.edit_btn.config(state="normal")
             self.delete_btn.config(state="normal")
+            self.approve_btn.config(state="normal")
+            self.reject_btn.config(state="normal")
 
     def insert_transactions_data(self):
         self.treeview.delete(*self.treeview.get_children())
-
         mydb = mysql.connector.connect(
             host="localhost",
             user="admin",
@@ -240,3 +297,26 @@ class View_Trans(Toplevel):
              self.handle_refresh()
          else:
              messagebox.showinfo("Error", "Unable to delete selected transaction")
+
+    def transaction_action(self, approved):
+        mydb = mysql.connector.connect(
+        host="localhost",
+        user="admin",
+        password="admin12",
+        database="sms"
+        )
+        mycursor = mydb.cursor()
+
+        query1 = "UPDATE transactions SET status = %s WHERE transaction_id = %s"
+        param_list1 = list()
+        param_list1.append(approved)
+        param_list1.append(self.selected_rid)
+        mycursor.execute(query1, param_list1)
+        mydb.commit()
+        values = self.treeview.item(self.selected_item, "values")
+        #values[7] = approved
+        values_list = list(values)
+        #values_list.append(*values)
+        values_list[7] = approved
+        self.treeview.item(self.selected_item, tags=[approved], values=values_list)
+        

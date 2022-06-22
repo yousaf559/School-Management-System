@@ -1,48 +1,30 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel
-# from view.home.manage_students.add_student.build.gui import add_Student_Window
-# from view.home.manage_students.view_students.build.gui import view_Students_Window
-from view.home_teacher.mark_student_attendance.build.gui import markStd_Attendance
-from view.home_teacher.approve_fee.build.gui import approveStd_Fee
-from view.home_teacher.apply_loan.build.gui import apply_Loan_Window
-from view.home_teacher.manage_assignments.build.gui import manage_Ass_Window
 
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./assets")
 
+
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-def tch_Dashboard_Window(teacher_id):
-    Tch_Dashboard(teacher_id)
+def manage_Ass_Window(teacher_id):
+    Manage_Asses(teacher_id)
 
-class Tch_Dashboard(Toplevel):
+class Manage_Asses(Toplevel):
 
-    def open_mark_std_atten(self):
-        markStd_Attendance(self.teacher_id)
-
-    def open_approve_std_fee(self):
-        approveStd_Fee(self.teacher_id)
-
-    def open_apply_loan(self):
-        apply_Loan_Window(self.teacher_id)
-
-    def open_manage_ass(self):
-        manage_Ass_Window(self.teacher_id)
-
-    def __init__(self, teacher_id,*args, **kwargs):
+    def __init__(self, teacher_id, *args, **kwargs):
 
         Toplevel.__init__(self, *args, **kwargs)
         self.teacher_id = teacher_id
-       
 
         self.title("School Management System")
 
         self.geometry("814x615")
         self.configure(bg="#FFFFFF")
 
-        self.current_window = None         
+        self.current_window = None     
 
         self.canvas = Canvas(
             self,
@@ -84,7 +66,7 @@ class Tch_Dashboard(Toplevel):
             69.0,
             108.0,
             anchor="nw",
-            text="Here you can choose a function",
+            text="Here you can manage Subject Assignments.",
             fill="#000000",
             font=("Inter", 20 * -1)
         )
@@ -93,11 +75,11 @@ class Tch_Dashboard(Toplevel):
             243.0,
             52.0,
             anchor="nw",
-            text="Teacher Dashboard\n",
+            text="Manage Assignments\n",
             fill="#000000",
             font=("Inter", 36 * -1)
         )
-
+            # New Assignment
         button_image_1 = PhotoImage(
             file=relative_to_assets("button_1.png"))
         button_1 = Button(
@@ -105,16 +87,16 @@ class Tch_Dashboard(Toplevel):
             image=button_image_1,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: self.open_mark_std_atten(),
+            command=lambda: self.openAddSubject(),
             relief="flat"
         )
         button_1.place(
-            x=87.0,
-            y=147.0,
+            x=124.0,
+            y=188.0,
             width=235.0,
             height=60.0
         )
-            # Log Out Button
+
         button_image_2 = PhotoImage(
             file=relative_to_assets("button_2.png"))
         button_2 = Button(
@@ -122,66 +104,65 @@ class Tch_Dashboard(Toplevel):
             image=button_image_2,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: quit(),
+            command=lambda: self.destroy(),
             relief="flat"
         )
         button_2.place(
-            x=583.0,
-            y=462.0,
-            width=165.0,
-            height=46.0
+            x=446.0,
+            y=468.0,
+            width=235.0,
+            height=60.0
         )
 
+        # button_image_3 = PhotoImage(
+        #     file=relative_to_assets("button_3.png"))
+        # button_3 = Button(
+        #     self.canvas,
+        #     image=button_image_3,
+        #     borderwidth=0,
+        #     highlightthickness=0,
+        #     command=lambda: print("button_3 clicked"),
+        #     relief="flat"
+        # )
+        # button_3.place(
+        #     x=446.0,
+        #     y=304.0,
+        #     width=235.0,
+        #     height=60.0
+        # )
+            # Manage Existing Assignments
         button_image_4 = PhotoImage(
-            file=relative_to_assets("button_3.png"))
+            file=relative_to_assets("button_4.png"))
         button_4 = Button(
             self.canvas,
             image=button_image_4,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: self.open_apply_loan(),
+            command=lambda: self.openViewSubjects(),
             relief="flat"
         )
         button_4.place(
-            x=487.0,
-            y=147.0,
-            width=175.0,
-            height=52.0
+            x=446.0,
+            y=188.0,
+            width=235.0,
+            height=60.0
         )
 
-        button_image_5 = PhotoImage(
-            file=relative_to_assets("button_4.png"))
-        button_5 = Button(
-            self.canvas,
-            image=button_image_5,
-            borderwidth=0,
-            highlightthickness=0,
-            command=lambda: self.open_approve_std_fee(),
-            relief="flat"
-        )
-        button_5.place(
-            x=87.0,
-            y=228.0,
-            width=175.0,
-            height=62.0
-        )
-
-        button_image_6 = PhotoImage(
-            file=relative_to_assets("button_5.png"))
-        button_6 = Button(
-            self.canvas,
-            image=button_image_6,
-            borderwidth=0,
-            highlightthickness=0,
-            command=lambda: self.open_manage_ass(),
-            relief="flat"
-        )
-        button_6.place(
-            x=487.0,
-            y=228.0,
-            width=250.0,
-            height=62.0
-        )
-
+        # button_image_5 = PhotoImage(
+        #     file=relative_to_assets("button_5.png"))
+        # button_5 = Button(
+        #     self.canvas,
+        #     image=button_image_5,
+        #     borderwidth=0,
+        #     highlightthickness=0,
+        #     command=lambda: print("button_5 clicked"),
+        #     relief="flat"
+        # )
+        # button_5.place(
+        #     x=124.0,
+        #     y=300.0,
+        #     width=235.0,
+        #     height=60.0
+        # )
         self.resizable(False, False)
         self.mainloop()

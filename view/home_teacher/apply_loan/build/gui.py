@@ -18,8 +18,8 @@ ASSETS_PATH = OUTPUT_PATH / Path("./assets")
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-def apply_Loan_Window():
-    Apply_Loan()
+def apply_Loan_Window(teacher_id):
+    Apply_Loan(teacher_id)
 
 class Apply_Loan(Toplevel):
 
@@ -29,10 +29,11 @@ class Apply_Loan(Toplevel):
     #     #homeWindow()
     #     self.home_manager.homeWindow()
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, teacher_id, *args, **kwargs):
 
         # self.home_manager=manager
         Toplevel.__init__(self, *args, **kwargs)
+        self.teacher_id = teacher_id
 
         self.title("School Management System")
 
@@ -88,7 +89,7 @@ class Apply_Loan(Toplevel):
 
         self.canvas.create_text(
             110.0,
-            340.0,
+            279.0,
             anchor="nw",
             text="Description:",
             fill="#000000",
@@ -120,58 +121,58 @@ class Apply_Loan(Toplevel):
             190.5,
             image=entry_image_1
         )
-        self.entry_1 = Entry(
+        self.amount = Entry(
             self,
             bd=0,
             bg="#D9D9D9",
             highlightthickness=0
         )
-        self.entry_1.place(
+        self.amount.place(
             x=275.0,
             y=171.0,
             width=331.0,
             height=37.0
         )
 
-        entry_image_2 = PhotoImage(
-            file=relative_to_assets("entry_2.png"))
-        entry_bg_2 = self.canvas.create_image(
-            440.5,
-            352.5,
-            image=entry_image_2
-        )
-        self.entry_2 = Entry(
-            self,
-            bd=0,
-            bg="#D9D9D9",
-            highlightthickness=0
-        )
-        self.entry_2.place(
-            x=275.0,
-            y=333.0,
-            width=331.0,
-            height=37.0
-        )
-
-        # entry_image_3 = PhotoImage(
-        #     file=relative_to_assets("entry_3.png"))
-        # entry_bg_3 = self.canvas.create_image(
+        # entry_image_2 = PhotoImage(
+        #     file=relative_to_assets("entry_2.png"))
+        # entry_bg_2 = self.canvas.create_image(
         #     440.5,
-        #     298.5,
-        #     image=entry_image_3
+        #     352.5,
+        #     image=entry_image_2
         # )
-        # self.entry_3 = Entry(
+        # self.entry_2 = Entry(
         #     self,
         #     bd=0,
         #     bg="#D9D9D9",
         #     highlightthickness=0
         # )
-        # self.entry_3.place(
+        # self.entry_2.place(
         #     x=275.0,
-        #     y=279.0,
+        #     y=333.0,
         #     width=331.0,
         #     height=37.0
         # )
+
+        entry_image_3 = PhotoImage(
+            file=relative_to_assets("entry_3.png"))
+        entry_bg_3 = self.canvas.create_image(
+            440.5,
+            298.5,
+            image=entry_image_3
+        )
+        self.description = Entry(
+            self,
+            bd=0,
+            bg="#D9D9D9",
+            highlightthickness=0
+        )
+        self.description.place(
+            x=275.0,
+            y=279.0,
+            width=331.0,
+            height=37.0
+        )
 
         entry_image_4 = PhotoImage(
             file=relative_to_assets("entry_4.png"))
@@ -180,13 +181,13 @@ class Apply_Loan(Toplevel):
             244.5,
             image=entry_image_4
         )
-        self.entry_4 = Entry(
+        self.type = Entry(
             self,
             bd=0,
             bg="#D9D9D9",
             highlightthickness=0
         )
-        self.entry_4.place(
+        self.type.place(
             x=275.0,
             y=225.0,
             width=331.0,
@@ -217,7 +218,7 @@ class Apply_Loan(Toplevel):
             image=button_image_2,
             borderwidth=0,
             highlightthickness=0,
-            command=self.add_transaction_info,
+            command=lambda: self.apply_for_payment(),
             relief="flat"
         )
         button_2.place(
@@ -230,29 +231,26 @@ class Apply_Loan(Toplevel):
         self.resizable(False, False)
         self.mainloop()
 
-    def add_transaction_info(self):
-        new_info = list()
-        new_info.append(self.entry_1.get())
-        new_info.append(self.entry_4.get())
-        new_info.append(self.entry_3.get())
-        new_info.append(self.entry_2.get())
-
-        mydb_conn = mysql.connector.connect(
+    def apply_for_payment(self):
+        mydb = mysql.connector.connect(
             host="localhost",
             user="admin",
             password="admin12",
             database="sms"
         )
-        cursor = mydb_conn.cursor()
+        mycursor = mydb.cursor()
+        query = "INSERT INTO transactions (transaction_date, amount, type, description, teacher_id) VALUES (CURRENT_DATE, %s, %s, %s, %s)"
+        param_list = list()
+        param_list.append(self.amount.get())
+        param_list.append(self.type.get())
+        param_list.append(self.description.get())
+        param_list.append(self.teacher_id)
+        mycursor.execute(query, param_list)
+        mydb.commit()
 
-        sql = "INSERT INTO transactions (transaction_date, amount, type, description) VALUES (%s, %s, %s, %s)"
-        cursor.execute(sql, new_info)
-
-        mydb_conn.commit()
-
-        if cursor.rowcount > 0:
-            messagebox.showinfo("Successful", "New Transaction Record Added")
+        if mycursor.rowcount > 0:
+            messagebox.showinfo("Successful", "Application for Loan Submitted")
             self.destroy()
 
         else:
-            messagebox.showerror("Error", "Failed to update student's details")
+            messagebox.showerror("Error", "Failed to Submit Application")

@@ -7,6 +7,7 @@ from view.home.manage_students.build.gui import manage_Std_Window
 from view.home.manage_subjects.build.gui import manage_Sbj_Window
 from view.home.manage_teachers.build.gui import manage_Tch_Window
 from view.home.manage_transactions.build.gui import manage_Trns_Window
+from view.home.manage_classes.build.gui import manage_Classes_Window
 from utils.Constants import Constants
 
 
@@ -52,6 +53,10 @@ class Home(Toplevel):
     def openManageTransactions(self):
         self.destroy()
         manage_Trns_Window(self.manager)
+
+    def openManageClasses(self):
+        self.destroy()
+        manage_Classes_Window(self.manager)
 
 
     def __init__(self, manager ,*args, **kwargs):
@@ -224,9 +229,43 @@ class Home(Toplevel):
             relief="flat"
         )
         button_7.place(
-            x=537.0,
-            y=446.0,
+            x=588.0,
+            y=476.0,
             width=165.0,
+            height=46.0
+        )
+
+        button_image_8 = PhotoImage(
+            file=relative_to_assets("button_8.png"))
+        button_8 = Button(
+            self.canvas,
+            image=button_image_8,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: self.openManageClasses(),
+            relief="flat"
+        )
+        button_8.place(
+            x=87.0,
+            y=390.0,
+            width=189.0,
+            height=46.0
+        )
+
+        button_image_9 = PhotoImage(
+            file=relative_to_assets("button_9.png"))
+        button_9 = Button(
+            self.canvas,
+            image=button_image_9,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: print("pepe"),
+            relief="flat"
+        )
+        button_9.place(
+            x=482.0,
+            y=390.0,
+            width=189.0,
             height=46.0
         )
 
