@@ -197,7 +197,9 @@ class Approve_Std_Fee(Toplevel):
         )
         mycursor = mydb.cursor()
 
-        sql = "SELECT students.*, transactions.transaction_id FROM students LEFT JOIN transactions ON students.student_id = transactions.student_id AND YEAR(transactions.transaction_date) = YEAR(CURRENT_DATE) WHERE students.student_id IN (SELECT student_id FROM Student_Br_Teacher WHERE teacher_id=%s);"
+
+        sql = "SELECT students.*, transactions.transaction_id FROM students LEFT JOIN transactions ON students.student_id = transactions.student_id AND YEAR(transactions.transaction_date) = YEAR(CURRENT_DATE) WHERE students.student_id IN (SELECT student_id FROM Student_Br_Teacher WHERE teacher_id=%s AND Student_Br_Teacher.class_year = YEAR(CURRENT_DATE))"
+        #sql = "SELECT students.*, transactions.transaction_id FROM students LEFT JOIN transactions ON students.student_id = transactions.student_id AND YEAR(transactions.transaction_date) = YEAR(CURRENT_DATE) WHERE students.student_id IN (SELECT student_id FROM Student_Br_Teacher WHERE teacher_id=%s);"
         mycursor.execute(sql, [str(self.teacher_id)])
         result = mycursor.fetchall()
         for row in result:

@@ -155,6 +155,7 @@ class View_Students(Toplevel):
             "Age": ["Age", 10],
             "Class": ["Class", 50],
             "Phone": ["Phone", 100],
+            "Fee Status": ["Fee Status", 100]
         }
 
         self.treeview = Treeview(
@@ -211,8 +212,9 @@ class View_Students(Toplevel):
             database="sms"
         )
         mycursor = mydb.cursor()
-
-        sql = "SELECT * from students"
+        
+        sql = "SELECT students.*, transactions.status FROM students LEFT OUTER JOIN transactions ON transactions.student_id = students.student_id LEFT OUTER JOIN Student_Br_Teacher ON Student_Br_Teacher.student_id = students.student_id WHERE Student_Br_Teacher.class_year = YEAR(CURRENT_DATE);"
+        #sql = "SELECT students.*, transactions.status FROM students LEFT OUTER JOIN transactions ON transactions.student_id = students.student_id;"
         mycursor.execute(sql)
         result = mycursor.fetchall()
         for row in result:
