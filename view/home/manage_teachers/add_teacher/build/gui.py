@@ -97,6 +97,24 @@ class Add_Teacher(Toplevel):
 
         self.canvas.create_text(
             110.0,
+            400.0,
+            anchor="nw",
+            text="Email:",
+            fill="#000000",
+            font=("Inter", 20 * -1)
+        )
+
+        self.canvas.create_text(
+            110.0,
+            440.0,
+            anchor="nw",
+            text="Password:",
+            fill="#000000",
+            font=("Inter", 20 * -1)
+        )
+
+        self.canvas.create_text(
+            110.0,
             281.0,
             anchor="nw",
             text="Subject: ",
@@ -202,6 +220,49 @@ class Add_Teacher(Toplevel):
             height=37.0
         )
 
+        entry_image_5 = PhotoImage(
+            file=relative_to_assets("entry_2.png"))
+        entry_bg_5 = self.canvas.create_image(
+            440.5,
+            406.5,
+            image=entry_image_5
+        )
+        self.entry_5 = Entry(
+            self,
+            bd=0,
+            bg="#D9D9D9",
+            highlightthickness=0
+        )
+        self.entry_5.place(
+            x=275.0,
+            y=387.0,
+            width=331.0,
+            height=37.0
+        )
+
+        entry_image_6 = PhotoImage(
+            file=relative_to_assets("entry_2.png"))
+        entry_bg_6 = self.canvas.create_image(
+            440.5,
+            460.5,
+            image=entry_image_6
+        )
+
+        self.entry_6 = Entry(
+            self,
+            bd=0,
+            bg="#D9D9D9",
+            highlightthickness=0,
+            state="normal",
+            show="*"
+        )
+        self.entry_6.place(
+            x=275.0,
+            y=441.0,
+            width=331.0,
+            height=37.0
+        )
+
         button_image_1 = PhotoImage(
             file=relative_to_assets("button_1.png"))
         button_1 = Button(
@@ -214,7 +275,7 @@ class Add_Teacher(Toplevel):
         )
         button_1.place(
             x=658.0,
-            y=466.0,
+            y=520.0,
             width=105.0,
             height=52.0
         )
@@ -231,7 +292,7 @@ class Add_Teacher(Toplevel):
         )
         button_2.place(
             x=280.0,
-            y=466.0,
+            y=520.0,
             width=231.0,
             height=52.0
         )
@@ -245,6 +306,8 @@ class Add_Teacher(Toplevel):
         new_info.append(self.entry_4.get())
         new_info.append(self.entry_3.get())
         new_info.append(self.entry_2.get())
+        new_info.append(self.entry_5.get())
+        new_info.append(self.entry_6.get())
 
         mydb_conn = mysql.connector.connect(
             host="localhost",
@@ -254,7 +317,7 @@ class Add_Teacher(Toplevel):
         )
         cursor = mydb_conn.cursor()
 
-        sql = "INSERT INTO teachers (teacher_name, teacher_address, subject_taught, teacher_phone) VALUES (%s, %s, %s, %s)"
+        sql = "INSERT INTO teachers (teacher_name, teacher_address, subject_taught, teacher_phone, tch_email, tch_password) VALUES (%s, %s, %s, %s, %s, %s)"
         cursor.execute(sql, new_info)
 
         mydb_conn.commit()
@@ -264,4 +327,4 @@ class Add_Teacher(Toplevel):
             self.destroy()
 
         else:
-            messagebox.showerror("Error", "Failed to update student's details")
+            messagebox.showerror("Error", "Failed to add record")

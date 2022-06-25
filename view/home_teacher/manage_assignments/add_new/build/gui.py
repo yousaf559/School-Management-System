@@ -2,6 +2,7 @@ from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel, StringVar, messagebox
 import mysql.connector
 
+
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./assets")
 
@@ -9,18 +10,22 @@ ASSETS_PATH = OUTPUT_PATH / Path("./assets")
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-def edit_Teacher_Window(parent,teacher_id):
-    Edit_Teacher(parent,teacher_id)
+def add_Ass_Window(teacher_id):
+    Add_Ass(teacher_id)
 
-class Edit_Teacher(Toplevel):
+class Add_Ass(Toplevel):
 
-    def __init__(self, parent, teacher_id, *args, **kwargs):
+        # FOR RETURNING TO DASHBOARD 
+    # def backToDashboard(self):
+    #     self.destroy()
+    #     #homeWindow()
+    #     self.home_manager.homeWindow()
+
+    def __init__(self, teacher_id, *args, **kwargs):
+        self.teacher_id = teacher_id
 
         # self.home_manager=manager
         Toplevel.__init__(self, *args, **kwargs)
-        self.teacher_id = teacher_id
-        self.parent = parent
-        self.display_teacher_info_to_edit()
 
         self.title("School Management System")
 
@@ -60,7 +65,7 @@ class Edit_Teacher(Toplevel):
             110.0,
             178.0,
             anchor="nw",
-            text="Full Name: ",
+            text="Name:",
             fill="#000000",
             font=("Inter", 20 * -1)
         )
@@ -69,7 +74,7 @@ class Edit_Teacher(Toplevel):
             110.0,
             232.0,
             anchor="nw",
-            text="Address",
+            text="Date:",
             fill="#000000",
             font=("Inter", 20 * -1)
         )
@@ -78,25 +83,7 @@ class Edit_Teacher(Toplevel):
             110.0,
             340.0,
             anchor="nw",
-            text="Phone:",
-            fill="#000000",
-            font=("Inter", 20 * -1)
-        )
-
-        self.canvas.create_text(
-            110.0,
-            400.0,
-            anchor="nw",
-            text="Email:",
-            fill="#000000",
-            font=("Inter", 20 * -1)
-        )
-
-        self.canvas.create_text(
-            110.0,
-            440.0,
-            anchor="nw",
-            text="Password:",
+            text="Resource URL:",
             fill="#000000",
             font=("Inter", 20 * -1)
         )
@@ -105,7 +92,7 @@ class Edit_Teacher(Toplevel):
             110.0,
             281.0,
             anchor="nw",
-            text="Subject: ",
+            text="Short Description: ",
             fill="#000000",
             font=("Inter", 20 * -1)
         )
@@ -114,7 +101,7 @@ class Edit_Teacher(Toplevel):
             215.0,
             95.0,
             anchor="nw",
-            text="Here you can edit a Teacher Record.",
+            text="Here you can add a new Assignment.",
             fill="#000000",
             font=("Inter", 20 * -1)
         )
@@ -123,7 +110,7 @@ class Edit_Teacher(Toplevel):
             260.0,
             27.0,
             anchor="nw",
-            text="Edit Teacher",
+            text="Add New Assignment",
             fill="#000000",
             font=("Inter", 36 * -1)
         )
@@ -135,15 +122,11 @@ class Edit_Teacher(Toplevel):
             190.5,
             image=entry_image_1
         )
-        entry_text_1 = StringVar()
-        entry_text_1.set(self.teacher_info[1])
         self.entry_1 = Entry(
             self,
             bd=0,
             bg="#D9D9D9",
-            highlightthickness=0,
-            state="normal",
-            textvariable=entry_text_1
+            highlightthickness=0
         )
         self.entry_1.place(
             x=275.0,
@@ -159,15 +142,11 @@ class Edit_Teacher(Toplevel):
             352.5,
             image=entry_image_2
         )
-        entry_text_2 = StringVar()
-        entry_text_2.set(self.teacher_info[4])
         self.entry_2 = Entry(
             self,
             bd=0,
             bg="#D9D9D9",
-            highlightthickness=0,
-            state="normal",
-            textvariable=entry_text_2
+            highlightthickness=0
         )
         self.entry_2.place(
             x=275.0,
@@ -183,15 +162,11 @@ class Edit_Teacher(Toplevel):
             298.5,
             image=entry_image_3
         )
-        entry_text_3 = StringVar()
-        entry_text_3.set(self.teacher_info[3])
         self.entry_3 = Entry(
             self,
             bd=0,
             bg="#D9D9D9",
-            highlightthickness=0,
-            state="normal",
-            textvariable=entry_text_3
+            highlightthickness=0
         )
         self.entry_3.place(
             x=275.0,
@@ -207,68 +182,15 @@ class Edit_Teacher(Toplevel):
             244.5,
             image=entry_image_4
         )
-        entry_text_4 = StringVar()
-        entry_text_4.set(self.teacher_info[2])
         self.entry_4 = Entry(
             self,
             bd=0,
             bg="#D9D9D9",
-            highlightthickness=0,
-            state="normal",
-            textvariable=entry_text_4
+            highlightthickness=0
         )
         self.entry_4.place(
             x=275.0,
             y=225.0,
-            width=331.0,
-            height=37.0
-        )
-
-        entry_image_5 = PhotoImage(
-            file=relative_to_assets("entry_2.png"))
-        entry_bg_5 = self.canvas.create_image(
-            440.5,
-            406.5,
-            image=entry_image_5
-        )
-        entry_text_5 = StringVar()
-        entry_text_5.set(self.teacher_info[5])
-        self.entry_5 = Entry(
-            self,
-            bd=0,
-            bg="#D9D9D9",
-            highlightthickness=0,
-            state="normal",
-            textvariable=entry_text_5
-        )
-        self.entry_5.place(
-            x=275.0,
-            y=387.0,
-            width=331.0,
-            height=37.0
-        )
-
-        entry_image_6 = PhotoImage(
-            file=relative_to_assets("entry_2.png"))
-        entry_bg_6 = self.canvas.create_image(
-            440.5,
-            460.5,
-            image=entry_image_5
-        )
-        entry_text_6 = StringVar()
-        entry_text_6.set(self.teacher_info[6])
-        self.entry_6 = Entry(
-            self,
-            bd=0,
-            bg="#D9D9D9",
-            highlightthickness=0,
-            state="normal",
-            textvariable=entry_text_6,
-            show="*"
-        )
-        self.entry_6.place(
-            x=275.0,
-            y=441.0,
             width=331.0,
             height=37.0
         )
@@ -285,7 +207,7 @@ class Edit_Teacher(Toplevel):
         )
         button_1.place(
             x=658.0,
-            y=520.0,
+            y=466.0,
             width=105.0,
             height=52.0
         )
@@ -297,12 +219,12 @@ class Edit_Teacher(Toplevel):
             image=button_image_2,
             borderwidth=0,
             highlightthickness=0,
-            command=self.update_teacher_info,
+            command=self.add_ass_info,
             relief="flat"
         )
         button_2.place(
             x=280.0,
-            y=520.0,
+            y=466.0,
             width=231.0,
             height=52.0
         )
@@ -310,30 +232,12 @@ class Edit_Teacher(Toplevel):
         self.resizable(False, False)
         self.mainloop()
 
-    def display_teacher_info_to_edit(self):
-        mydb = mysql.connector.connect(
-            host="localhost",
-            user="admin",
-            password="admin12",
-            database="sms"
-        )
-        mycursor = mydb.cursor()
-
-        sql = "SELECT * from teachers where teacher_id = " + self.teacher_id + ";"
-        mycursor.execute(sql)
-        result = mycursor.fetchall()
-        self.teacher_info = result[0]
-        mydb.close()
-
-    def update_teacher_info(self):
-        updated_info = list()
-        updated_info.append(self.entry_1.get())
-        updated_info.append(self.entry_4.get())
-        updated_info.append(self.entry_3.get())
-        updated_info.append(self.entry_2.get())
-        updated_info.append(self.entry_5.get())
-        updated_info.append(self.entry_6.get())
-        updated_info.append(self.teacher_id)
+    def add_ass_info(self):
+        new_info = list()
+        new_info.append(self.entry_1.get())
+        new_info.append(self.entry_4.get())
+        new_info.append(self.entry_3.get())
+        new_info.append(self.entry_2.get())
 
         mydb_conn = mysql.connector.connect(
             host="localhost",
@@ -343,15 +247,14 @@ class Edit_Teacher(Toplevel):
         )
         cursor = mydb_conn.cursor()
 
-        sql = "UPDATE teachers SET teacher_name = %s, teacher_address = %s, subject_taught = %s, teacher_phone = %s, tch_email = %s, tch_password = %s WHERE teacher_id = %s"
-        cursor.execute(sql, updated_info)
+        sql = "INSERT INTO assignments (name, date, description, resource) VALUES (%s, %s, %s, %s)"
+        cursor.execute(sql, new_info)
 
         mydb_conn.commit()
 
         if cursor.rowcount > 0:
-            messagebox.showinfo("Successful", "Details Updated Successfully")
+            messagebox.showinfo("Successful", "New Assignment Created")
             self.destroy()
-            self.parent.handle_refresh()
 
         else:
-            messagebox.showerror("Error", "Failed to update teacher's details")
+            messagebox.showerror("Error", "Failed to create Assignment")

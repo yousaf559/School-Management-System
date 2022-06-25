@@ -1,6 +1,7 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel
-
+from view.home_teacher.manage_assignments.add_new.build.gui import add_Ass_Window
+from view.home_teacher.manage_assignments.view_existing.build.gui import view_Asses_Window
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./assets")
@@ -13,6 +14,13 @@ def manage_Ass_Window(teacher_id):
     Manage_Asses(teacher_id)
 
 class Manage_Asses(Toplevel):
+
+    def openAddAss(self):
+        add_Ass_Window(self.teacher_id)
+
+    def openViewAss(self):
+        view_Asses_Window(self.teacher_id)
+
 
     def __init__(self, teacher_id, *args, **kwargs):
 
@@ -87,7 +95,7 @@ class Manage_Asses(Toplevel):
             image=button_image_1,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: self.openAddSubject(),
+            command=lambda: self.openAddAss(),
             relief="flat"
         )
         button_1.place(
@@ -138,7 +146,7 @@ class Manage_Asses(Toplevel):
             image=button_image_4,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: self.openViewSubjects(),
+            command=lambda: self.openViewAss(),
             relief="flat"
         )
         button_4.place(
