@@ -1,5 +1,5 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel, StringVar, messagebox
+from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel, StringVar, messagebox, OptionMenu
 import mysql.connector
 from tkinter.ttk import Treeview
 
@@ -11,8 +11,8 @@ ASSETS_PATH = OUTPUT_PATH / Path("./assets")
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-def mark_Ass_Window():
-    Mark_Ass()
+def mark_Ass_Window(teacher_id, assignment_id):
+    Mark_Ass(teacher_id, assignment_id)
 
 class Mark_Ass(Toplevel):
 
@@ -22,7 +22,9 @@ class Mark_Ass(Toplevel):
     #     #homeWindow()
     #     self.home_manager.homeWindow()
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, teacher_id, assignment_id, *args, **kwargs):
+        self.teacher_id = teacher_id
+        self.assignment_id = assignment_id
 
         # self.home_manager=manager
         Toplevel.__init__(self, *args, **kwargs)
@@ -87,7 +89,7 @@ class Mark_Ass(Toplevel):
         self.treeview.place(x=221.0, y=302.0, width=447.0, height=184.0)
 
         # set data in tree
-        self.insert_transactions_data()
+        self.insert_students_assignment_data()
         # Add selection event
         self.treeview.bind("<<TreeviewSelect>>", self.on_treeview_select)
 
@@ -134,38 +136,38 @@ class Mark_Ass(Toplevel):
             190.5,
             image=entry_image_1
         )
-        self.entry_1 = Entry(
+        self.marks = Entry(
             self,
             bd=0,
             bg="#D9D9D9",
             highlightthickness=0
         )
-        self.entry_1.place(
+        self.marks.place(
             x=275.0,
             y=171.0,
             width=331.0,
             height=37.0
         )
 
-        entry_image_4 = PhotoImage(
-            file=relative_to_assets("entry_4.png"))
-        entry_bg_4 = self.canvas.create_image(
-            440.5,
-            244.5,
-            image=entry_image_4
-        )
-        self.entry_4 = Entry(
-            self,
-            bd=0,
-            bg="#D9D9D9",
-            highlightthickness=0
-        )
-        self.entry_4.place(
-            x=275.0,
-            y=225.0,
-            width=331.0,
-            height=37.0
-        )
+        # entry_image_4 = PhotoImage(
+        #     file=relative_to_assets("entry_4.png"))
+        # entry_bg_4 = self.canvas.create_image(
+        #     440.5,
+        #     244.5,
+        #     image=entry_image_4
+        # )
+        # self.entry_4 = Entry(
+        #     self,
+        #     bd=0,
+        #     bg="#D9D9D9",
+        #     highlightthickness=0
+        # )
+        # self.entry_4.place(
+        #     x=275.0,
+        #     y=225.0,
+        #     width=331.0,
+        #     height=37.0
+        # )
 
         button_image_1 = PhotoImage(
             file=relative_to_assets("button_1.png"))
@@ -179,26 +181,56 @@ class Mark_Ass(Toplevel):
         )
         button_1.place(
             x=658.0,
-            y=466.0,
+            y=520.0,
             width=105.0,
             height=52.0
         )
 
         button_image_2 = PhotoImage(
-            file=relative_to_assets("button_2.png"))
+            file=relative_to_assets("mark.png"))
         button_2 = Button(
             self.canvas,
             image=button_image_2,
             borderwidth=0,
             highlightthickness=0,
-            command=self.add_transaction_info,
+            command=lambda: self.submission(),
             relief="flat"
         )
         button_2.place(
             x=280.0,
-            y=466.0,
-            width=231.0,
-            height=52.0
+            y=520.0,
+            width=105.0,
+            height=48.0
+        )
+
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="admin",
+            password="admin12",
+            database="sms"
+        )
+        mycursor = mydb.cursor()
+
+        sql = "SELECT student_id, student_name, student_phone FROM students WHERE student_id IN (SELECT student_id FROM Student_Br_Teacher WHERE teacher_id= " +str(self.teacher_id)+ ")"
+        mycursor.execute(sql)
+        teachers = mycursor.fetchall()
+        self.students_hash = {}
+        for id, name, email in teachers:
+          self.students_hash[id] = f'{id} / {name} / {email}'
+
+        self.menu= StringVar()
+        self.menu.set("Select Student")
+        self.drop= OptionMenu(
+            self,
+            self.menu,
+            command=lambda x:  self.display_selected(),
+            *self.students_hash.values()
+           )
+        self.drop.place(
+            x=275.0,
+            y=225.0,
+            width=331.0,
+            height=37.0
         )
 
         self.resizable(False, False)
@@ -215,8 +247,6 @@ class Mark_Ass(Toplevel):
         self.selected_item = self.treeview.selection()[0]
         # Get the room id
         self.selected_rid = self.treeview.item(self.selected_item, "values")[0]
-        self.edit_btn.config(state="normal")
-        self.delete_btn.config(state="normal")
 
     def insert_students_assignment_data(self):
         self.treeview.delete(*self.treeview.get_children())
@@ -234,3 +264,45 @@ class Mark_Ass(Toplevel):
         for row in result:
             self.treeview.insert("", "end", values=row)
         mydb.close()
+
+    def display_selected(self):
+        student_hash_values = list(self.students_hash.values())
+        student_hash_keys = list(self.students_hash.keys())
+        self.student_id = student_hash_keys[student_hash_values.index(self.menu.get())]
+
+    def submission(self):
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="admin",
+            password="admin12",
+            database="sms"
+        )
+        mycursor = mydb.cursor()
+        params = []
+        sql = "SELECT * FROM students_asses WHERE student_id = %s AND ass_id = %s"
+        params.append(self.student_id)
+        params.append(self.assignment_id)
+        mycursor.execute(sql, params)
+        result = mycursor.fetchall()
+        if len(result) > 0:
+            sql = "UPDATE students_asses SET grade = %s WHERE student_id = %s AND ass_id = %s"
+            update_param_list = list()
+            update_param_list.append(self.marks.get())
+            update_param_list.append(self.student_id)
+            update_param_list.append(self.assignment_id)
+            mycursor.execute(sql, update_param_list)
+            mydb.commit()
+            
+        else:
+            sql = "INSERT INTO students_asses (student_id, ass_id, grade) VALUES (%s, %s, %s)"
+            param_list = list()
+            param_list.append(self.student_id)
+            param_list.append(self.assignment_id)
+            param_list.append(self.marks.get())
+            mycursor.execute(sql, param_list)
+            mydb.commit()
+        self.refresh_table()
+
+    def refresh_table(self):
+        #self.treeview.destroy()
+        self.insert_students_assignment_data()

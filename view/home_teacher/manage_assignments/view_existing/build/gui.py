@@ -29,7 +29,7 @@ class View_Asses(Toplevel):
         edit_Ass_Window(self, self.teacher_id, self.selected_rid)
 
     def openMarkAss(self):
-        mark_Ass_Window(self, self.teacher_id, self.selected_rid)
+        mark_Ass_Window(self.teacher_id, self.selected_rid)
 
     def __init__(self, teacher_id, *args, **kwargs):
 
@@ -118,7 +118,7 @@ class View_Asses(Toplevel):
             state="disabled"
         )
         self.edit_btn.place(
-            x=254.0,
+            x=200.0,
             y=462.0,
             width=116.0,
             height=48.0
@@ -136,7 +136,25 @@ class View_Asses(Toplevel):
             state="disabled",
         )
         self.delete_btn.place(
-            x=380.0,
+            x=450.0,
+            y=462.0,
+            width=116.0,
+            height=48.0
+        )
+
+        button_image_6 = PhotoImage(
+            file=relative_to_assets("mark.png"))
+        self.mark_btn = Button(
+            self.canvas,
+            image=button_image_6,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: self.openMarkAss(),
+            relief="flat",
+            state="disabled",
+        )
+        self.mark_btn.place(
+            x=320.0,
             y=462.0,
             width=116.0,
             height=48.0
@@ -196,6 +214,7 @@ class View_Asses(Toplevel):
             self.selected_rid = self.treeview.item(self.selected_item, "values")[0]
             self.edit_btn.config(state="normal")
             self.delete_btn.config(state="normal")
+            self.mark_btn.config(state="normal")
 
     def insert_asses_data(self):
         self.treeview.delete(*self.treeview.get_children())
