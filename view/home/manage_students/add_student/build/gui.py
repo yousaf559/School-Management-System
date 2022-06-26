@@ -107,19 +107,19 @@ class Add_Student(Toplevel):
             110.0,
             340.0,
             anchor="nw",
-            text="Class:",
+            text="Phone:",
             fill="#000000",
             font=("Inter", 20 * -1)
         )
 
-        self.canvas.create_text(
-            110.0,
-            395.0,
-            anchor="nw",
-            text="Phone: ",
-            fill="#000000",
-            font=("Inter", 20 * -1)
-        )
+        # self.canvas.create_text(
+        #     110.0,
+        #     395.0,
+        #     anchor="nw",
+        #     text="Phone: ",
+        #     fill="#000000",
+        #     font=("Inter", 20 * -1)
+        # )
 
         self.canvas.create_text(
             110.0,
@@ -169,26 +169,26 @@ class Add_Student(Toplevel):
             height=37.0
         )
 
-        entry_image_2 = PhotoImage(
-            file=relative_to_assets("entry_2.png"))
-        entry_bg_2 = self.canvas.create_image(
-            440.5,
-            406.5,
-            image=entry_image_2
-        )
+        # entry_image_2 = PhotoImage(
+        #     file=relative_to_assets("entry_2.png"))
+        # entry_bg_2 = self.canvas.create_image(
+        #     440.5,
+        #     406.5,
+        #     image=entry_image_2
+        # )
 
-        self.entry_2 = Entry(
-            self,
-            bd=0,
-            bg="#D9D9D9",
-            highlightthickness=0
-        )
-        self.entry_2.place(
-            x=275.0,
-            y=387.0,
-            width=331.0,
-            height=37.0
-        )
+        # self.entry_2 = Entry(
+        #     self,
+        #     bd=0,
+        #     bg="#D9D9D9",
+        #     highlightthickness=0
+        # )
+        # self.entry_2.place(
+        #     x=275.0,
+        #     y=387.0,
+        #     width=331.0,
+        #     height=37.0
+        # )
 
         entry_image_3 = PhotoImage(
             file=relative_to_assets("entry_3.png"))
@@ -278,7 +278,6 @@ class Add_Student(Toplevel):
         add_info.append(self.entry_5.get())
         add_info.append(self.entry_4.get())
         add_info.append(self.entry_3.get())
-        add_info.append(self.entry_2.get())
 
         mydb_conn = mysql.connector.connect(
             host="localhost",
@@ -288,7 +287,7 @@ class Add_Student(Toplevel):
         )
         cursor = mydb_conn.cursor()
 
-        sql = "INSERT INTO students (student_name, student_address, student_age, student_class, student_phone) VALUES (%s, %s, %s, %s, %s)"
+        sql = "INSERT INTO students (student_name, student_address, student_age, student_phone) VALUES (%s, %s, %s, %s)"
         cursor.execute(sql, add_info)
 
         mydb_conn.commit()

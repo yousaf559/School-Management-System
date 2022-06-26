@@ -74,7 +74,7 @@ class Add_Ass(Toplevel):
             110.0,
             232.0,
             anchor="nw",
-            text="Date:",
+            text="Date(YYYY-MM-DD):",
             fill="#000000",
             font=("Inter", 20 * -1)
         )

@@ -159,7 +159,7 @@ class Mark_Std_Atten(Toplevel):
             "Name": ["Name", 100],
             "Address": ["Address", 250],
             "Age": ["Age", 20],
-            "Class": ["Class", 10],
+            "Phone": ["Phone", 10],
         }
 
         self.treeview = Treeview(

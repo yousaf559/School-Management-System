@@ -72,7 +72,7 @@ class Add_Trans(Toplevel):
             110.0,
             178.0,
             anchor="nw",
-            text="Date:",
+            text="Date(YYYY-MM-DD):",
             fill="#000000",
             font=("Inter", 20 * -1)
         )

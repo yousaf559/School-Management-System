@@ -1,6 +1,7 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel
 from view.home.manage_classes.create_class.build.gui import create_Class_Window
+from view.home.manage_classes.edit_class.build.gui import edit_Class_Window
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./assets")
@@ -22,6 +23,9 @@ class Manage_Classes(Toplevel):
 
     def open_create_class(self):
         create_Class_Window()
+
+    def open_edit_class(self):
+        edit_Class_Window()
 
     def __init__(self, manager, *args, **kwargs):
 
@@ -147,7 +151,7 @@ class Manage_Classes(Toplevel):
             image=button_image_4,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: self.openViewSubjects(),
+            command=lambda: self.open_edit_class(),
             relief="flat"
         )
         button_4.place(

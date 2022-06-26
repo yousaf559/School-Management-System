@@ -1,17 +1,8 @@
 from pathlib import Path
-import tkinter
 from tkinter.ttk import Treeview
-
+from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel, messagebox
 import mysql.connector
-
-from tkinter import Frame, ttk, messagebox
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel
-
-from view.home.manage_students.view_students.edit_student.build.gui import edit_Student_Window
-
 from tkinter.messagebox import askyesno
-
-
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./assets")
@@ -20,26 +11,29 @@ ASSETS_PATH = OUTPUT_PATH / Path("./assets")
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-def view_Students_Window():
-    View_Students()
+def edit_Class_Window():
+    Edit_Class()
 
-class View_Students(Toplevel):
+class Edit_Class(Toplevel):
 
-    def openEditStudent(self):
-        edit_Student_Window(self, self.selected_rid)
+        # FOR RETURNING TO DASHBOARD 
+    # def backToDashboard(self):
+    #     self.destroy()
+    #     #homeWindow()
+    #     self.home_manager.homeWindow()
 
     def __init__(self, *args, **kwargs):
 
         # self.home_manager=manager
         Toplevel.__init__(self, *args, **kwargs)
+
         self.title("School Management System")
 
         self.geometry("810x562")
         self.configure(bg="#FFFFFF")
 
-        self.current_window = None
+        self.current_window = None     
 
-        
         self.canvas = Canvas(
             self,
             bg = "#FFFFFF",
@@ -68,7 +62,7 @@ class View_Students(Toplevel):
             outline="")
 
         self.canvas.create_text(
-            10.0,
+            11.0,
             521.0,
             anchor="nw",
             text="All rights reserved ",
@@ -80,7 +74,7 @@ class View_Students(Toplevel):
             297.0,
             30.0,
             anchor="nw",
-            text="Students",
+            text="Classes",
             fill="#000000",
             font=("Inter", 36 * -1)
         )
@@ -102,6 +96,24 @@ class View_Students(Toplevel):
             height=46.0
         )
 
+        button_image_4 = PhotoImage(
+            file=relative_to_assets("button_4.png"))
+        self.edit_btn = Button(
+            self.canvas,
+            image=button_image_4,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: print("sadasda"),
+            relief="flat",
+            state="disabled"
+        )
+        self.edit_btn.place(
+            x=254.0,
+            y=462.0,
+            width=116.0,
+            height=48.0
+        )
+
         self.canvas.create_rectangle(
             28.0,
             16.0,
@@ -110,50 +122,9 @@ class View_Students(Toplevel):
             fill="#D9D9D9",
             outline="")
 
-        button_image_4 = PhotoImage(
-            file=relative_to_assets("button_4.png"))
-        self.edit_btn = Button(
-            self.canvas,
-            image=button_image_4,
-            borderwidth=0,
-            highlightthickness=0,
-            command=lambda: self.handle_edit(),
-            relief="flat",
-            state="disabled",
-        )
-        self.edit_btn.place(
-            x=254.0,
-            y=462.0,
-            width=116.0,
-            height=48.0
-        )
-        button_image_5 = PhotoImage(
-            file=relative_to_assets("button_3.png"))
-        self.delete_btn = Button(
-            self.canvas,
-            image=button_image_5,
-            borderwidth=0,
-            highlightthickness=0,
-            command=lambda: self.delete_student(),
-            relief="flat",
-            state="disabled",
-        )
-        self.delete_btn.place(
-            x=380.0,
-            y=462.0,
-            width=116.0,
-            height=48.0
-        )
-
-
         self.columns = {
-            "ID": ["ID", 5],
-            "Name": ["Name", 100],
-            "Address": ["Address", 150],
-            "Age": ["Age", 10],
-            "Phone": ["Phone", 50],
-            "Class": ["Class", 100],
-            "Fee Status": ["Fee Status", 100]
+            "Class Name": ["Class Name", 50],
+            "Year": ["Year", 20],
         }
 
         self.treeview = Treeview(
@@ -175,14 +146,10 @@ class View_Students(Toplevel):
 
         self.treeview.place(x=64.0, y=135.0, width=672.0, height=300.0)
 
-       # set data in tree
-        self.insert_students_data()
+        # set data in tree
+        self.insert_classes_data()
         # Add selection event
         self.treeview.bind("<<TreeviewSelect>>", self.on_treeview_select)
-
-        # mydb.close()
-        #
-        # #self.resizable(False, False)
         self.mainloop()
 
     def on_treeview_select(self, event=None):
@@ -193,14 +160,11 @@ class View_Students(Toplevel):
                 return
             # Get the selected item
             item = self.treeview.selection()[0]
-            # Get the room id
+            # Get the id
             self.selected_rid = self.treeview.item(item, "values")[0]
             self.edit_btn.config(state="normal")
-            self.delete_btn.config(state="normal")
-            #print("Done")
 
-
-    def insert_students_data(self):
+    def insert_classes_data(self):
         self.treeview.delete(*self.treeview.get_children())
 
         mydb = mysql.connector.connect(
@@ -210,62 +174,41 @@ class View_Students(Toplevel):
             database="sms"
         )
         mycursor = mydb.cursor()
-        
-        sql = "SELECT students.*, CONCAT(Student_Br_Teacher.class_name, ' / ', Student_Br_Teacher.class_year), transactions.status FROM students LEFT OUTER JOIN transactions ON transactions.student_id = students.student_id LEFT OUTER JOIN Student_Br_Teacher ON Student_Br_Teacher.student_id = students.student_id WHERE Student_Br_Teacher.class_year = YEAR(CURRENT_DATE);"
-        #sql = "SELECT students.*, transactions.status FROM students LEFT OUTER JOIN transactions ON transactions.student_id = students.student_id;"
+
+        sql = "SELECT DISTINCT class_name, class_year FROM Student_Br_Teacher;"
         mycursor.execute(sql)
         result = mycursor.fetchall()
         for row in result:
             self.treeview.insert("", "end", values=row)
         mydb.close()
 
-    def handle_edit(self):
-        self.openEditStudent()
-
-
-    def delete_student(self):
-
-        confirm_delete = askyesno(title='Confirmation',
-                          message='Are you sure that you want to delete selected record?')
-        if confirm_delete:
-
-         mydb = mysql.connector.connect(
-            host="localhost",
-            user="admin",
-            password="admin12",
-            database="sms"
-         )
-
-         mycursor = mydb.cursor()
-         query = "delete from students where student_id = %s"
-         param_list = list()
-         param_list.append(self.selected_rid)
-         mycursor.execute(query, param_list)
-         mydb.commit()
-         if mycursor.rowcount > 0:
-             messagebox.showinfo("Successful", "Student Record Deleted Successfully")
-             self.handle_refresh()
-         else:
-             messagebox.showinfo("Error", "Unable to delete selected student")
-
+    # def handle_edit(self):
+    #     self.openEditSubject()
 
     def handle_refresh(self):
-        self.insert_students_data()
-        # self.treeview.delete(*self.treeview.get_children())
+       self.insert_classes_data()
 
-        # mydb = mysql.connector.connect(
-        #     host="localhost",
-        #     user="admin",
-        #     password="admin12",
-        #     database="sms"
-        # )
-        # mycursor = mydb.cursor()
+    # def delete_subject(self):
 
-        # sql = "SELECT * from students"
-        # mycursor.execute(sql)
-        # result = mycursor.fetchall()
-        # for row in result:
-        #     self.treeview.insert("", "end", values=row)
-        # mydb.close()
+    #     confirm_delete = askyesno(title='Confirmation',
+    #                       message='Are you sure that you want to delete selected record?')
+    #     if confirm_delete:
 
+    #      mydb = mysql.connector.connect(
+    #         host="localhost",
+    #         user="admin",
+    #         password="admin12",
+    #         database="sms"
+    #      )
 
+    #      mycursor = mydb.cursor()
+    #      query = "DELETE from subjects WHERE subject_id = %s"
+    #      param_list = list()
+    #      param_list.append(self.selected_rid)
+    #      mycursor.execute(query, param_list)
+    #      mydb.commit()
+    #      if mycursor.rowcount > 0:
+    #          messagebox.showinfo("Successful", "Subject Record Deleted Successfully")
+    #          self.handle_refresh()
+    #      else:
+    #          messagebox.showinfo("Error", "Unable to delete selected subject")

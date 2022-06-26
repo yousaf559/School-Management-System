@@ -1,6 +1,7 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel, StringVar, messagebox
 import mysql.connector
+from validate_email import validate_email
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./assets")
@@ -326,32 +327,35 @@ class Edit_Teacher(Toplevel):
         mydb.close()
 
     def update_teacher_info(self):
-        updated_info = list()
-        updated_info.append(self.entry_1.get())
-        updated_info.append(self.entry_4.get())
-        updated_info.append(self.entry_3.get())
-        updated_info.append(self.entry_2.get())
-        updated_info.append(self.entry_5.get())
-        updated_info.append(self.entry_6.get())
-        updated_info.append(self.teacher_id)
+        if validate_email(self.entry_5.get()):
+            updated_info = list()
+            updated_info.append(self.entry_1.get())
+            updated_info.append(self.entry_4.get())
+            updated_info.append(self.entry_3.get())
+            updated_info.append(self.entry_2.get())
+            updated_info.append(self.entry_5.get())
+            updated_info.append(self.entry_6.get())
+            updated_info.append(self.teacher_id)
 
-        mydb_conn = mysql.connector.connect(
-            host="localhost",
-            user="admin",
-            password="admin12",
-            database="sms"
-        )
-        cursor = mydb_conn.cursor()
+            mydb_conn = mysql.connector.connect(
+                host="localhost",
+                user="admin",
+                password="admin12",
+                database="sms"
+            )
+            cursor = mydb_conn.cursor()
 
-        sql = "UPDATE teachers SET teacher_name = %s, teacher_address = %s, subject_taught = %s, teacher_phone = %s, tch_email = %s, tch_password = %s WHERE teacher_id = %s"
-        cursor.execute(sql, updated_info)
+            sql = "UPDATE teachers SET teacher_name = %s, teacher_address = %s, subject_taught = %s, teacher_phone = %s, tch_email = %s, tch_password = %s WHERE teacher_id = %s"
+            cursor.execute(sql, updated_info)
 
-        mydb_conn.commit()
+            mydb_conn.commit()
 
-        if cursor.rowcount > 0:
-            messagebox.showinfo("Successful", "Details Updated Successfully")
-            self.destroy()
-            self.parent.handle_refresh()
+            if cursor.rowcount > 0:
+                messagebox.showinfo("Successful", "Details Updated Successfully")
+                self.destroy()
+                self.parent.handle_refresh()
 
+            else:
+                messagebox.showerror("Error", "Failed to update teacher's details")
         else:
-            messagebox.showerror("Error", "Failed to update teacher's details")
+            messagebox.showerror("Error", "Enter a valid email address")

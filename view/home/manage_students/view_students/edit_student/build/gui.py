@@ -99,19 +99,19 @@ class Edit_Student(Toplevel):
             110.0,
             340.0,
             anchor="nw",
-            text="Class:",
+            text="Phone:",
             fill="#000000",
             font=("Inter", 20 * -1)
         )
 
-        self.canvas.create_text(
-            110.0,
-            395.0,
-            anchor="nw",
-            text="Phone: ",
-            fill="#000000",
-            font=("Inter", 20 * -1)
-        )
+        # self.canvas.create_text(
+        #     110.0,
+        #     395.0,
+        #     anchor="nw",
+        #     text="Phone: ",
+        #     fill="#000000",
+        #     font=("Inter", 20 * -1)
+        # )
 
         self.canvas.create_text(
             110.0,
@@ -164,28 +164,28 @@ class Edit_Student(Toplevel):
             height=37.0
         )
 
-        entry_image_2 = PhotoImage(
-            file=relative_to_assets("entry_3.png"))
-        entry_bg_2 = self.canvas.create_image(
-            440.5,
-            406.5,
-            image=entry_image_2
-        )
-        entry_text_2 = StringVar()
-        entry_text_2.set(self.student_info[5])
-        self.entry_2 = Entry(
-            self,
-            bd=0,
-            bg="#CDCDCD",
-            highlightthickness=0,
-            textvariable= entry_text_2
-        )
-        self.entry_2.place(
-            x=275.0,
-            y=387.0,
-            width=331.0,
-            height=37.0
-        )
+        # entry_image_2 = PhotoImage(
+        #     file=relative_to_assets("entry_3.png"))
+        # entry_bg_2 = self.canvas.create_image(
+        #     440.5,
+        #     406.5,
+        #     image=entry_image_2
+        # )
+        # entry_text_2 = StringVar()
+        # entry_text_2.set(self.student_info[4])
+        # self.entry_2 = Entry(
+        #     self,
+        #     bd=0,
+        #     bg="#CDCDCD",
+        #     highlightthickness=0,
+        #     textvariable= entry_text_2
+        # )
+        # self.entry_2.place(
+        #     x=275.0,
+        #     y=387.0,
+        #     width=331.0,
+        #     height=37.0
+        # )
 
         entry_image_3 = PhotoImage(
             file=relative_to_assets("entry_3.png"))
@@ -294,9 +294,9 @@ class Edit_Student(Toplevel):
         updated_info = list()
         updated_info.append(self.entry_1.get())
         updated_info.append(self.entry_5.get())
+        # updated_info.append(self.entry_4.get())
         updated_info.append(self.entry_4.get())
         updated_info.append(self.entry_3.get())
-        updated_info.append(self.entry_2.get())
         updated_info.append(self.student_id)
 
         mydb_conn = mysql.connector.connect(
@@ -307,7 +307,7 @@ class Edit_Student(Toplevel):
         )
         cursor = mydb_conn.cursor()
 
-        sql = "UPDATE students SET student_name = %s, student_address = %s, student_age = %s,  student_class = %s, student_phone = %s WHERE student_id = %s"
+        sql = "UPDATE students SET student_name = %s, student_address = %s, student_age = %s,  student_phone = %s WHERE student_id = %s"
         cursor.execute(sql, updated_info)
 
         mydb_conn.commit()

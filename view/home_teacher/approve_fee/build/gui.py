@@ -141,8 +141,7 @@ class Approve_Std_Fee(Toplevel):
             "ID": ["ID", 10],
             "Name": ["Name", 100],
             "Address": ["Address", 250],
-            "Age": ["Age", 20],
-            "Class": ["Class", 10],
+            "Age": ["Age", 20]
         }
 
         self.treeview = Treeview(
@@ -203,7 +202,7 @@ class Approve_Std_Fee(Toplevel):
         mycursor.execute(sql, [str(self.teacher_id)])
         result = mycursor.fetchall()
         for row in result:
-            if row[6]:
+            if row[5]:
                 self.treeview.insert("", "end", values=row, tags=['present'])
             else:
                 self.treeview.insert("", "end", values=row, tags=['default'])

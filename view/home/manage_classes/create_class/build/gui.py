@@ -287,7 +287,7 @@ class Create_Class(Toplevel):
         )
         mycursor = mydb.cursor()
 
-        sql = "SELECT student_id, student_name, student_age, student_phone from students"
+        sql = "SELECT student_id, student_name, student_age, student_phone from students WHERE student_id NOT IN (SELECT student_id FROM Student_Br_Teacher)"
         mycursor.execute(sql)
         result = mycursor.fetchall()
         for row in result:
