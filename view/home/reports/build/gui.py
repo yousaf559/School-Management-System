@@ -1,8 +1,7 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel
-from view.home.manage_transactions.add_transaction.build.gui import add_Trans_Window
-from view.home.manage_transactions.view_transactions.build.gui import view_Trans_Window
-from view.home.manage_transactions.staff_salary.build.gui import staff_salary_Window
+from tkinter.ttk import Treeview
+
 
 
 OUTPUT_PATH = Path(__file__).parent
@@ -12,25 +11,16 @@ ASSETS_PATH = OUTPUT_PATH / Path("./assets")
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-def manage_Trns_Window(manager):
-    Manage_Trns(manager = manager)
+def reports_Window(manager):
+    Reports(manager = manager)
 
-class Manage_Trns(Toplevel):
+class Reports(Toplevel):
 
         # FOR RETURNING TO DASHBOARD 
     def backToDashboard(self):
         self.destroy()
         #homeWindow()
         self.home_manager.homeWindow()
-
-    def openManageTransactions(self):
-        add_Trans_Window()
-
-    def openViewTransactions(self):
-        view_Trans_Window()
-
-    def openStaffSalary(self):
-        staff_salary_Window()
 
     def __init__(self, manager, *args, **kwargs):
 
@@ -42,7 +32,7 @@ class Manage_Trns(Toplevel):
         self.geometry("814x615")
         self.configure(bg="#FFFFFF")
 
-        self.current_window = None   
+        self.current_window = None     
 
         self.canvas = Canvas(
             self,
@@ -84,16 +74,16 @@ class Manage_Trns(Toplevel):
             69.0,
             108.0,
             anchor="nw",
-            text="Here you can choose whether to Add, Edit or Delete a Transaction",
+            text="Here you can choose to generate reports.",
             fill="#000000",
             font=("Inter", 20 * -1)
         )
 
         self.canvas.create_text(
-            214.0,
-            49.0,
+            243.0,
+            52.0,
             anchor="nw",
-            text="Manage Transactions\n",
+            text="Reports\n",
             fill="#000000",
             font=("Inter", 36 * -1)
         )
@@ -105,14 +95,14 @@ class Manage_Trns(Toplevel):
             image=button_image_1,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: self.openManageTransactions(),
+            command=lambda: print("sadasdad"),
             relief="flat"
         )
         button_1.place(
-            x=124.0,
-            y=188.0,
-            width=235.0,
-            height=60.0
+            x=224.0,
+            y=520.0,
+            width=83.0,
+            height=43.0
         )
 
         button_image_2 = PhotoImage(
@@ -126,12 +116,12 @@ class Manage_Trns(Toplevel):
             relief="flat"
         )
         button_2.place(
-            x=446.0,
-            y=468.0,
+            x=530.0,
+            y=520.0,
             width=235.0,
             height=60.0
         )
-        
+
         button_image_4 = PhotoImage(
             file=relative_to_assets("button_4.png"))
         button_4 = Button(
@@ -139,32 +129,61 @@ class Manage_Trns(Toplevel):
             image=button_image_4,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: self.openViewTransactions(),
+            command=lambda: print("sadasdad"),
             relief="flat"
         )
         button_4.place(
-            x=446.0,
-            y=188.0,
-            width=235.0,
-            height=60.0
+            x=326.0,
+            y=520.0,
+            width=155.0,
+            height=42.0
         )
 
-        button_image_5 = PhotoImage(
-            file=relative_to_assets("button_3.png"))
-        button_5 = Button(
-            self.canvas,
-            image=button_image_5,
-            borderwidth=0,
-            highlightthickness=0,
-            command=lambda: self.openStaffSalary(),
-            relief="flat"
-        )
-        button_5.place(
-            x=124.0,
-            y=388.0,
-            width=235.0,
-            height=68.0
+        self.columns = {
+            "Name": ["Name", 100],
+        }
+
+        self.treeview = Treeview(
+            self,
+            columns=list(self.columns.keys()),
+            show="headings",
+            height=200,
+            selectmode="browse",
+            # ="#FFFFFF",
+            # fg="#5E95FF",
+            # font=("Montserrat Bold", 18 * -1)
         )
 
-        self.resizable(False, False)
+        # Show the headings
+        for idx, txt in self.columns.items():
+            self.treeview.heading(idx, text=txt[0])
+            # Set the column widths
+            self.treeview.column(idx, width=txt[1])
+
+        self.treeview.place(x=64.0, y=135.0, width=672.0, height=300.0)
+
+        # Add selection event
+        self.treeview.bind("<<TreeviewSelect>>", self.on_treeview_select)
+
+        reports = [
+            "order by most paid teacher",
+            "student with highest total marks for each class",
+            "student with attendance",
+            "teacher with attendance"
+            ]
+
+        for row in reports:
+            self.treeview.insert("", "end", values=[row])
+
         self.mainloop()
+
+    def on_treeview_select(self, event=None):
+            try:
+                self.treeview.selection()[0]
+            except:
+                self.selected_rid = None
+                return
+            # Get the selected item
+            item = self.treeview.selection()[0]
+            # Get the room id
+            self.selected_rid = self.treeview.item(item, "values")[0]

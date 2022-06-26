@@ -104,6 +104,15 @@ class Edit_Teacher(Toplevel):
 
         self.canvas.create_text(
             110.0,
+            495.0,
+            anchor="nw",
+            text="Salary:",
+            fill="#000000",
+            font=("Inter", 20 * -1)
+        )
+
+        self.canvas.create_text(
+            110.0,
             281.0,
             anchor="nw",
             text="Subject: ",
@@ -304,6 +313,30 @@ class Edit_Teacher(Toplevel):
             height=37.0
         )
 
+        entry_image_7 = PhotoImage(
+            file=relative_to_assets("entry_2.png"))
+        entry_bg_7 = self.canvas.create_image(
+            440.5,
+            514.5,
+            image=entry_image_7
+        )
+        entry_text_7 = StringVar()
+        entry_text_7.set(self.teacher_info[7])
+        self.entry_7 = Entry(
+            self,
+            bd=0,
+            bg="#D9D9D9",
+            highlightthickness=0,
+            state="normal",
+            textvariable=entry_text_7
+        )
+        self.entry_7.place(
+            x=275.0,
+            y=495.0,
+            width=331.0,
+            height=37.0
+        )
+
         button_image_1 = PhotoImage(
             file=relative_to_assets("button_1.png"))
         button_1 = Button(
@@ -316,7 +349,7 @@ class Edit_Teacher(Toplevel):
         )
         button_1.place(
             x=658.0,
-            y=520.0,
+            y=540.0,
             width=105.0,
             height=52.0
         )
@@ -333,7 +366,7 @@ class Edit_Teacher(Toplevel):
         )
         button_2.place(
             x=280.0,
-            y=520.0,
+            y=540.0,
             width=231.0,
             height=52.0
         )
@@ -365,6 +398,7 @@ class Edit_Teacher(Toplevel):
             updated_info.append(self.entry_2.get())
             updated_info.append(self.entry_5.get())
             updated_info.append(self.entry_6.get())
+            updated_info.append(self.entry_7.get())
             updated_info.append(self.teacher_id)
 
             mydb_conn = mysql.connector.connect(
@@ -375,7 +409,7 @@ class Edit_Teacher(Toplevel):
             )
             cursor = mydb_conn.cursor()
 
-            sql = "UPDATE teachers SET teacher_name = %s, teacher_address = %s, subject_taught = %s, teacher_phone = %s, tch_email = %s, tch_password = %s WHERE teacher_id = %s"
+            sql = "UPDATE teachers SET teacher_name = %s, teacher_address = %s, subject_taught = %s, teacher_phone = %s, tch_email = %s, tch_password = %s, salary = %s WHERE teacher_id = %s"
             cursor.execute(sql, updated_info)
 
             mydb_conn.commit()

@@ -8,6 +8,7 @@ from view.home.manage_subjects.build.gui import manage_Sbj_Window
 from view.home.manage_teachers.build.gui import manage_Tch_Window
 from view.home.manage_transactions.build.gui import manage_Trns_Window
 from view.home.manage_classes.build.gui import manage_Classes_Window
+from view.home.reports.build.gui import reports_Window
 from utils.Constants import Constants
 
 
@@ -57,6 +58,10 @@ class Home(Toplevel):
     def openManageClasses(self):
         self.destroy()
         manage_Classes_Window(self.manager)
+
+    def openReports(self):
+        self.destroy()
+        reports_Window(self.manager)
 
 
     def __init__(self, manager ,*args, **kwargs):
@@ -252,6 +257,7 @@ class Home(Toplevel):
             height=46.0
         )
 
+            # Reports
         button_image_9 = PhotoImage(
             file=relative_to_assets("button_9.png"))
         button_9 = Button(
@@ -259,7 +265,7 @@ class Home(Toplevel):
             image=button_image_9,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("pepe"),
+            command=lambda: self.openReports(),
             relief="flat"
         )
         button_9.place(

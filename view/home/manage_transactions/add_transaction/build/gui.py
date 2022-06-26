@@ -125,7 +125,7 @@ class Add_Trans(Toplevel):
         entry_image_1 = PhotoImage(
             file=relative_to_assets("entry_1.png"))
         entry_bg_1 = self.canvas.create_image(
-            440.5,
+            475.5,
             190.5,
             image=entry_image_1
         )
@@ -136,7 +136,7 @@ class Add_Trans(Toplevel):
             highlightthickness=0
         )
         self.entry_1.place(
-            x=275.0,
+            x=310.0,
             y=171.0,
             width=331.0,
             height=37.0
@@ -145,7 +145,7 @@ class Add_Trans(Toplevel):
         entry_image_2 = PhotoImage(
             file=relative_to_assets("entry_2.png"))
         entry_bg_2 = self.canvas.create_image(
-            440.5,
+            475.5,
             352.5,
             image=entry_image_2
         )
@@ -156,7 +156,7 @@ class Add_Trans(Toplevel):
             highlightthickness=0
         )
         self.entry_2.place(
-            x=275.0,
+            x=310.0,
             y=333.0,
             width=331.0,
             height=37.0
@@ -165,7 +165,7 @@ class Add_Trans(Toplevel):
         entry_image_3 = PhotoImage(
             file=relative_to_assets("entry_3.png"))
         entry_bg_3 = self.canvas.create_image(
-            440.5,
+            475.5,
             298.5,
             image=entry_image_3
         )
@@ -176,7 +176,7 @@ class Add_Trans(Toplevel):
             highlightthickness=0
         )
         self.entry_3.place(
-            x=275.0,
+            x=310.0,
             y=279.0,
             width=331.0,
             height=37.0
@@ -185,7 +185,7 @@ class Add_Trans(Toplevel):
         entry_image_4 = PhotoImage(
             file=relative_to_assets("entry_4.png"))
         entry_bg_4 = self.canvas.create_image(
-            440.5,
+            475.5,
             244.5,
             image=entry_image_4
         )
@@ -196,7 +196,7 @@ class Add_Trans(Toplevel):
             highlightthickness=0
         )
         self.entry_4.place(
-            x=275.0,
+            x=310.0,
             y=225.0,
             width=331.0,
             height=37.0

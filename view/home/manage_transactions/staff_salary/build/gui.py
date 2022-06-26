@@ -1,9 +1,8 @@
 from pathlib import Path
-from tkinter.ttk import Treeview
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel, messagebox
+from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel, StringVar, messagebox
 import mysql.connector
-from view.home.manage_teachers.view_teachers.edit_teacher.build.gui import edit_Teacher_Window
-from tkinter.messagebox import askyesno
+from tkinter.ttk import Treeview
+
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./assets")
@@ -12,19 +11,16 @@ ASSETS_PATH = OUTPUT_PATH / Path("./assets")
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-def view_Teachers_Window():
-    View_Teachers()
+def staff_salary_Window():
+    Staff_Salary()
 
-class View_Teachers(Toplevel):
+class Staff_Salary(Toplevel):
 
         # FOR RETURNING TO DASHBOARD 
     # def backToDashboard(self):
     #     self.destroy()
     #     #homeWindow()
     #     self.home_manager.homeWindow()
-
-    def openEditTeacher(self):
-        edit_Teacher_Window(self, self.selected_rid)
 
     def __init__(self, *args, **kwargs):
 
@@ -33,7 +29,7 @@ class View_Teachers(Toplevel):
 
         self.title("School Management System")
 
-        self.geometry("810x562")
+        self.geometry("814x615")
         self.configure(bg="#FFFFFF")
 
         self.current_window = None     
@@ -41,8 +37,8 @@ class View_Teachers(Toplevel):
         self.canvas = Canvas(
             self,
             bg = "#FFFFFF",
-            height = 562,
-            width = 809,
+            height = 614,
+            width = 817,
             bd = 0,
             highlightthickness = 0,
             relief = "ridge"
@@ -50,42 +46,42 @@ class View_Teachers(Toplevel):
 
         self.canvas.place(x = 0, y = 0)
         self.canvas.create_rectangle(
-            10.0,
-            17.0,
-            810.0,
-            562.0,
+            20.0,
+            12.0,
+            817.0,
+            614.0,
             fill="#AFAEF0",
             outline="")
 
         self.canvas.create_rectangle(
             0.0,
             0.0,
-            797.0,
-            549.0,
-            fill="#FFFDFD",
+            800.0,
+            600.0,
+            fill="#FFFFFF",
             outline="")
 
         self.canvas.create_text(
-            11.0,
-            521.0,
+            215.0,
+            95.0,
             anchor="nw",
-            text="All rights reserved ",
+            text="Here you can pay salary to staff.",
             fill="#000000",
-            font=("Inter", 12 * -1)
+            font=("Inter", 20 * -1)
         )
 
         self.canvas.create_text(
-            297.0,
-            30.0,
+            260.0,
+            27.0,
             anchor="nw",
-            text="Teachers",
+            text="Pay Salary",
             fill="#000000",
             font=("Inter", 36 * -1)
         )
 
         button_image_1 = PhotoImage(
             file=relative_to_assets("button_1.png"))
-        self.button_1 = Button(
+        button_1 = Button(
             self.canvas,
             image=button_image_1,
             borderwidth=0,
@@ -93,61 +89,34 @@ class View_Teachers(Toplevel):
             command=lambda: self.destroy(),
             relief="flat"
         )
-        self.button_1.place(
-            x=583.0,
-            y=462.0,
-            width=165.0,
-            height=46.0
+        button_1.place(
+            x=658.0,
+            y=466.0,
+            width=105.0,
+            height=52.0
         )
 
-        button_image_4 = PhotoImage(
-            file=relative_to_assets("button_4.png"))
-        self.edit_btn = Button(
+        button_image_2 = PhotoImage(
+            file=relative_to_assets("button_2.png"))
+        button_2 = Button(
             self.canvas,
-            image=button_image_4,
+            image=button_image_2,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: self.handle_edit(),
-            relief="flat",
-            state="disabled"
+            command=lambda: self.pay_salary(),
+            relief="flat"
         )
-        self.edit_btn.place(
-            x=254.0,
-            y=462.0,
-            width=116.0,
-            height=48.0
+        button_2.place(
+            x=280.0,
+            y=466.0,
+            width=231.0,
+            height=52.0
         )
-
-        button_image_5 = PhotoImage(
-            file=relative_to_assets("button_3.png"))
-        self.delete_btn = Button(
-            self.canvas,
-            image=button_image_5,
-            borderwidth=0,
-            highlightthickness=0,
-            command=lambda: self.delete_teacher(),
-            relief="flat",
-            state="disabled",
-        )
-        self.delete_btn.place(
-            x=380.0,
-            y=462.0,
-            width=116.0,
-            height=48.0
-        )
-
-        self.canvas.create_rectangle(
-            28.0,
-            16.0,
-            29.0,
-            18.0,
-            fill="#D9D9D9",
-            outline="")
 
         self.columns = {
             "ID": ["ID", 10],
             "Name": ["Name", 100],
-            "Address": ["Address", 150],
+            "Address": ["Address", 170],
             "Subject Taught": ["Subject Taught", 80],
             "Phone": ["Phone", 80],
             "Salary": ["Salary", 80],
@@ -178,7 +147,6 @@ class View_Teachers(Toplevel):
         self.treeview.bind("<<TreeviewSelect>>", self.on_treeview_select)
         self.mainloop()
 
-
     def on_treeview_select(self, event=None):
             try:
                 self.treeview.selection()[0]
@@ -187,10 +155,9 @@ class View_Teachers(Toplevel):
                 return
             # Get the selected item
             item = self.treeview.selection()[0]
-            # Get the room id
+            # Get the id
             self.selected_rid = self.treeview.item(item, "values")[0]
-            self.edit_btn.config(state="normal")
-            self.delete_btn.config(state="normal")
+            self.salary = self.treeview.item(item, "values")[5]
 
     def insert_teachers_data(self):
         self.treeview.delete(*self.treeview.get_children())
@@ -211,38 +178,32 @@ class View_Teachers(Toplevel):
             self.treeview.insert("", "end", values=row)
         mydb.close()
 
-    def handle_edit(self):
-        self.openEditTeacher()
-
     def handle_refresh(self):
        self.insert_teachers_data()
 
-    def delete_teacher(self):
 
-        confirm_delete = askyesno(title='Confirmation',
-                          message='Are you sure that you want to delete selected record?')
-        if confirm_delete:
-
-         mydb = mysql.connector.connect(
+    def pay_salary(self):
+        mydb = mysql.connector.connect(
             host="localhost",
             user="admin",
             password="admin12",
             database="sms"
-         )
+        )
+        mycursor = mydb.cursor()
 
-         mycursor = mydb.cursor()
-         query = "DELETE from teachers WHERE teacher_id = %s"
-         param_list = list()
-         param_list.append(self.selected_rid)
-         mycursor.execute(query, param_list)
-         mydb.commit()
-         if mycursor.rowcount > 0:
-             messagebox.showinfo("Successful", "Teacher Record Deleted Successfully")
-             self.handle_refresh()
-         else:
-             messagebox.showinfo("Error", "Unable to delete selected teacher")
+        myparam = list()
+        myparam.append(self.salary)
+        myparam.append(self.selected_rid)
 
-
-
+        sql = "SELECT * from transactions WHERE teacher_id = %s AND type = 'Salary' AND MONTH(transaction_date) = MONTH(CURRENT_DATE())"
+        mycursor.execute(sql, [self.selected_rid])
+        result = mycursor.fetchall()
+        if len(result) <= 0:
+            sql = "INSERT INTO transactions (transaction_date, amount, type, teacher_id, status, description) VALUES (current_date(), %s, 'Salary', %s, 'approved', '')"
+            mycursor.execute(sql, myparam)
+            mydb.commit()
+            mydb.close()
+        else:
+            messagebox.showerror("Error","Salary Already Paid to Selected Staff Member for this month")
 
 
