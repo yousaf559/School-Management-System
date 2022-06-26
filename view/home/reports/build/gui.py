@@ -1,5 +1,5 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel
+from tkinter import CENTER, Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel
 from tkinter.ttk import Treeview
 from tkinter import filedialog
 from view.home.reports.sugggestions.build.gui import suggestions_Window
@@ -26,7 +26,7 @@ class Reports(Toplevel):
         #homeWindow()
         self.home_manager.homeWindow()
 
-    def openSuggestions():
+    def openSuggestions(self):
         suggestions_Window()
 
     def __init__(self, manager, *args, **kwargs):
@@ -35,7 +35,7 @@ class Reports(Toplevel):
             "Order by Most Paid Teachers": "SELECT teachers.*, transactions.amount FROM teachers LEFT JOIN transactions ON transactions.teacher_id = teachers.teacher_id WHERE transactions.type = 'Salary' ORDER BY transactions.amount DESC;",
             "Order by Highest Achieving Student" : "SELECT students.*, student_br_teacher.class_year, SUM(students_asses.grade) as total_marks FROM students LEFT JOIN students_asses ON students.student_id = students_asses.student_id LEFT JOIN student_br_teacher ON student_br_teacher.student_id = students.student_id WHERE student_br_teacher.class_year = YEAR(current_date()) GROUP BY students_asses.student_id;",
             "Order by Student With Highest Attendance" : "SELECT students.*, COUNT(std_attendance.student_id) as total_attendance FROM students LEFT JOIN std_attendance ON std_attendance.student_id = students.student_id WHERE YEAR(std_attendance.date)=YEAR(current_date()) GROUP BY std_attendance.student_id ORDER BY COUNT(std_attendance.student_id) DESC;",
-            "Order by Teacher With Highest Attendance:" : "SELECT teachers.*, COUNT(tch_attendance.teacher_id) as total_attendance FROM teachers LEFT JOIN tch_attendance ON tch_attendance.teacher_id = teachers.teacher_id WHERE YEAR(tch_attendance.date)=YEAR(current_date()) GROUP BY tch_attendance.teacher_id ORDER BY COUNT(tch_attendance.teacher_id) DESC;"
+            "Order by Teacher With Highest Attendance" : "SELECT teachers.*, COUNT(tch_attendance.teacher_id) as total_attendance FROM teachers LEFT JOIN tch_attendance ON tch_attendance.teacher_id = teachers.teacher_id WHERE YEAR(tch_attendance.date)=YEAR(current_date()) GROUP BY tch_attendance.teacher_id ORDER BY COUNT(tch_attendance.teacher_id) DESC;"
         }
 
         self.home_manager=manager

@@ -20,6 +20,30 @@ class EmailSendingService:
     TODAY_DATE = date.today()
 
     @classmethod
+    def send_suggestion(cls, title, description):
+        receiver_email = ["yousafzafar_98@live.com"] # TODO: replace with your recipients
+        msg = MIMEMultipart()
+        msg["Subject"] = 'Report Suggestion ' + title
+        msg["From"] = EmailSendingService.SENDER_EMAIL
+        msg['To'] = ", ".join(receiver_email)
+
+        ## Plain text
+        text = description
+
+        body_text = MIMEText(text, 'plain')  # 
+        msg.attach(body_text)  # attaching the text body into msg
+        context = ssl.create_default_context()
+        # Try to log in to server and send email
+        server = smtplib.SMTP(EmailSendingService.SMTP_SERVER, EmailSendingService.PORT)
+        server.ehlo()  # check connection
+        server.starttls(context=context)  # Secure the connection
+        server.ehlo()  # check connection
+        server.login(EmailSendingService.SENDER_EMAIL, EmailSendingService.PASSWORD)
+
+        # Send email here
+        server.sendmail(EmailSendingService.SENDER_EMAIL, receiver_email, msg.as_string())
+
+    @classmethod
     def alert_admin(cls):
         receiver_email = ["yousafzafar_98@live.com"] # TODO: replace with your recipients
         msg = MIMEMultipart()

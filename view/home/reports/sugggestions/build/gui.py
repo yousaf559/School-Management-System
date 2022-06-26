@@ -1,7 +1,7 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel, StringVar, messagebox
 import mysql.connector
-
+from services.email_sending_service import EmailSendingService
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./assets")
@@ -21,11 +21,10 @@ class Suggestions(Toplevel):
     #     #homeWindow()
     #     self.home_manager.homeWindow()
 
-    def __init__(self, teacher_id, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
 
         # self.home_manager=manager
         Toplevel.__init__(self, *args, **kwargs)
-        self.teacher_id = teacher_id
 
         self.title("School Management System")
 
@@ -74,7 +73,7 @@ class Suggestions(Toplevel):
             110.0,
             232.0,
             anchor="nw",
-            text="Description:",
+            text=" Short Descrip.:",
             fill="#000000",
             font=("Inter", 20 * -1)
         )
@@ -104,13 +103,13 @@ class Suggestions(Toplevel):
             190.5,
             image=entry_image_1
         )
-        self.amount = Entry(
+        self.title = Entry(
             self,
             bd=0,
             bg="#D9D9D9",
             highlightthickness=0
         )
-        self.amount.place(
+        self.title.place(
             x=275.0,
             y=171.0,
             width=331.0,
@@ -121,7 +120,7 @@ class Suggestions(Toplevel):
             file=relative_to_assets("entry_3.png"))
         entry_bg_3 = self.canvas.create_image(
             440.5,
-            298.5,
+            244.5,
             image=entry_image_3
         )
         self.description = Entry(
@@ -132,7 +131,7 @@ class Suggestions(Toplevel):
         )
         self.description.place(
             x=275.0,
-            y=279.0,
+            y=225.0,
             width=331.0,
             height=37.0
         )
@@ -161,7 +160,7 @@ class Suggestions(Toplevel):
             image=button_image_2,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("submit"),
+            command=lambda: self.submit_suggestion(),
             relief="flat"
         )
         button_2.place(
@@ -174,26 +173,6 @@ class Suggestions(Toplevel):
         self.resizable(False, False)
         self.mainloop()
 
-    def apply_for_payment(self):
-        mydb = mysql.connector.connect(
-            host="localhost",
-            user="admin",
-            password="admin12",
-            database="sms"
-        )
-        mycursor = mydb.cursor()
-        query = "INSERT INTO transactions (transaction_date, amount, type, description, teacher_id) VALUES (CURRENT_DATE, %s, %s, %s, %s)"
-        param_list = list()
-        param_list.append(self.amount.get())
-        param_list.append(self.type.get())
-        param_list.append(self.description.get())
-        param_list.append(self.teacher_id)
-        mycursor.execute(query, param_list)
-        mydb.commit()
-
-        if mycursor.rowcount > 0:
-            messagebox.showinfo("Successful", "Application for Loan Submitted")
-            self.destroy()
-
-        else:
-            messagebox.showerror("Error", "Failed to Submit Application")
+    def submit_suggestion(self):
+        EmailSendingService.send_suggestion(self.title.get(), self.description.get())
+        self.destroy()

@@ -151,7 +151,7 @@ class View_Students(Toplevel):
             "Name": ["Name", 100],
             "Address": ["Address", 150],
             "Age": ["Age", 10],
-            "Phone": ["Phone", 50],
+            "Emergency Phone": ["Emergency Phone", 85],
             "Class": ["Class", 100],
             "Fee Status": ["Fee Status", 100]
         }
