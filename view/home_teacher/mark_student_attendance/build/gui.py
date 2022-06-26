@@ -215,7 +215,7 @@ class Mark_Std_Atten(Toplevel):
         )
         mycursor = mydb.cursor()
 
-        sql = "SELECT * FROM students WHERE student_id IN (SELECT student_id FROM Student_Br_Teacher WHERE teacher_id= " +str(self.teacher_id)+ ")"
+        sql = "SELECT * FROM students WHERE student_id IN (SELECT student_id FROM Student_Br_Teacher WHERE teacher_id= " +str(self.teacher_id)+ " AND Student_Br_Teacher.class_year = YEAR(CURRENT_DATE))"
         mycursor.execute(sql)
         result = mycursor.fetchall()
         for row in result:

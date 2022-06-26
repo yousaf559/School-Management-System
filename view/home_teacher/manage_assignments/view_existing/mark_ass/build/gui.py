@@ -11,8 +11,8 @@ ASSETS_PATH = OUTPUT_PATH / Path("./assets")
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-def mark_Ass_Window(teacher_id, assignment_id):
-    Mark_Ass(teacher_id, assignment_id)
+def mark_Ass_Window(teacher_id, assignment_id, total_marks):
+    Mark_Ass(teacher_id, assignment_id, total_marks)
 
 class Mark_Ass(Toplevel):
 
@@ -22,9 +22,10 @@ class Mark_Ass(Toplevel):
     #     #homeWindow()
     #     self.home_manager.homeWindow()
 
-    def __init__(self, teacher_id, assignment_id, *args, **kwargs):
+    def __init__(self, teacher_id, assignment_id, total_marks, *args, **kwargs):
         self.teacher_id = teacher_id
         self.assignment_id = assignment_id
+        self.total_marks = total_marks
 
         # self.home_manager=manager
         Toplevel.__init__(self, *args, **kwargs)
@@ -149,26 +150,6 @@ class Mark_Ass(Toplevel):
             height=37.0
         )
 
-        # entry_image_4 = PhotoImage(
-        #     file=relative_to_assets("entry_4.png"))
-        # entry_bg_4 = self.canvas.create_image(
-        #     440.5,
-        #     244.5,
-        #     image=entry_image_4
-        # )
-        # self.entry_4 = Entry(
-        #     self,
-        #     bd=0,
-        #     bg="#D9D9D9",
-        #     highlightthickness=0
-        # )
-        # self.entry_4.place(
-        #     x=275.0,
-        #     y=225.0,
-        #     width=331.0,
-        #     height=37.0
-        # )
-
         button_image_1 = PhotoImage(
             file=relative_to_assets("button_1.png"))
         button_1 = Button(
@@ -211,7 +192,7 @@ class Mark_Ass(Toplevel):
         )
         mycursor = mydb.cursor()
 
-        sql = "SELECT student_id, student_name, student_phone FROM students WHERE student_id IN (SELECT student_id FROM Student_Br_Teacher WHERE teacher_id= " +str(self.teacher_id)+ ")"
+        sql = "SELECT student_id, student_name, student_phone FROM students WHERE student_id IN (SELECT student_id FROM Student_Br_Teacher WHERE teacher_id= " +str(self.teacher_id)+ " AND Student_Br_Teacher.class_year = YEAR(CURRENT_DATE))"
         mycursor.execute(sql)
         teachers = mycursor.fetchall()
         self.students_hash = {}
@@ -258,7 +239,7 @@ class Mark_Ass(Toplevel):
         )
         mycursor = mydb.cursor()
 
-        sql = "SELECT * from students_asses"
+        sql = "SELECT * from students_asses WHERE student_id IN (SELECT student_id FROM Student_Br_Teacher WHERE teacher_id= " +str(self.teacher_id)+ " AND Student_Br_Teacher.class_year = YEAR(CURRENT_DATE))"
         mycursor.execute(sql)
         result = mycursor.fetchall()
         for row in result:
@@ -271,38 +252,40 @@ class Mark_Ass(Toplevel):
         self.student_id = student_hash_keys[student_hash_values.index(self.menu.get())]
 
     def submission(self):
-        mydb = mysql.connector.connect(
-            host="localhost",
-            user="admin",
-            password="admin12",
-            database="sms"
-        )
-        mycursor = mydb.cursor()
-        params = []
-        sql = "SELECT * FROM students_asses WHERE student_id = %s AND ass_id = %s"
-        params.append(self.student_id)
-        params.append(self.assignment_id)
-        mycursor.execute(sql, params)
-        result = mycursor.fetchall()
-        if len(result) > 0:
-            sql = "UPDATE students_asses SET grade = %s WHERE student_id = %s AND ass_id = %s"
-            update_param_list = list()
-            update_param_list.append(self.marks.get())
-            update_param_list.append(self.student_id)
-            update_param_list.append(self.assignment_id)
-            mycursor.execute(sql, update_param_list)
-            mydb.commit()
-            
+        if int(self.marks.get()) <= int(self.total_marks) and int(self.marks.get()) >= 0:
+            mydb = mysql.connector.connect(
+                host="localhost",
+                user="admin",
+                password="admin12",
+                database="sms"
+            )
+            mycursor = mydb.cursor()
+            params = []
+            sql = "SELECT * FROM students_asses WHERE student_id = %s AND ass_id = %s"
+            params.append(self.student_id)
+            params.append(self.assignment_id)
+            mycursor.execute(sql, params)
+            result = mycursor.fetchall()
+            if len(result) > 0:
+                sql = "UPDATE students_asses SET grade = %s WHERE student_id = %s AND ass_id = %s"
+                update_param_list = list()
+                update_param_list.append(self.marks.get())
+                update_param_list.append(self.student_id)
+                update_param_list.append(self.assignment_id)
+                mycursor.execute(sql, update_param_list)
+                mydb.commit()
+                
+            else:
+                sql = "INSERT INTO students_asses (student_id, ass_id, grade) VALUES (%s, %s, %s)"
+                param_list = list()
+                param_list.append(self.student_id)
+                param_list.append(self.assignment_id)
+                param_list.append(self.marks.get())
+                mycursor.execute(sql, param_list)
+                mydb.commit()
         else:
-            sql = "INSERT INTO students_asses (student_id, ass_id, grade) VALUES (%s, %s, %s)"
-            param_list = list()
-            param_list.append(self.student_id)
-            param_list.append(self.assignment_id)
-            param_list.append(self.marks.get())
-            mycursor.execute(sql, param_list)
-            mydb.commit()
+            messagebox.showerror("STOP RIGHT THERE CRIMINAL SCUM", "Sahi marks dal na salay")
         self.refresh_table()
 
     def refresh_table(self):
-        #self.treeview.destroy()
         self.insert_students_assignment_data()

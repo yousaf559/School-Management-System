@@ -202,7 +202,8 @@ class View_Teachers(Toplevel):
         )
         mycursor = mydb.cursor()
 
-        sql = "SELECT * from teachers"
+        # sql = "SELECT teacher_id, teacher_name, teacher_address, subject_taught, teacher_phone from teachers"
+        sql = "SELECT teachers.teacher_id, teachers.teacher_name, teachers.teacher_address, subjects.subject_name, teachers.teacher_phone from teachers LEFT JOIN subjects ON subjects.subject_id = teachers.subject_taught;"
         mycursor.execute(sql)
         result = mycursor.fetchall()
         for row in result:

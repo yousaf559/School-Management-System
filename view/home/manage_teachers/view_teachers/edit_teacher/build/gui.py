@@ -1,5 +1,5 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel, StringVar, messagebox
+from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel, StringVar, messagebox, OptionMenu
 import mysql.connector
 from validate_email import validate_email
 
@@ -161,7 +161,7 @@ class Edit_Teacher(Toplevel):
             image=entry_image_2
         )
         entry_text_2 = StringVar()
-        entry_text_2.set(self.teacher_info[4])
+        entry_text_2.set(self.teacher_info[3])
         self.entry_2 = Entry(
             self,
             bd=0,
@@ -177,24 +177,54 @@ class Edit_Teacher(Toplevel):
             height=37.0
         )
 
-        entry_image_3 = PhotoImage(
-            file=relative_to_assets("entry_3.png"))
-        entry_bg_3 = self.canvas.create_image(
-            440.5,
-            298.5,
-            image=entry_image_3
+        # entry_image_3 = PhotoImage(
+        #     file=relative_to_assets("entry_3.png"))
+        # entry_bg_3 = self.canvas.create_image(
+        #     440.5,
+        #     298.5,
+        #     image=entry_image_3
+        # )
+        # entry_text_3 = StringVar()
+        # entry_text_3.set(self.teacher_info[3])
+        # self.entry_3 = Entry(
+        #     self,
+        #     bd=0,
+        #     bg="#D9D9D9",
+        #     highlightthickness=0,
+        #     state="normal",
+        #     textvariable=entry_text_3
+        # )
+        # self.entry_3.place(
+        #     x=275.0,
+        #     y=279.0,
+        #     width=331.0,
+        #     height=37.0
+        # )
+
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="admin",
+            password="admin12",
+            database="sms"
         )
-        entry_text_3 = StringVar()
-        entry_text_3.set(self.teacher_info[3])
-        self.entry_3 = Entry(
+        mycursor = mydb.cursor()
+
+        sql = "SELECT subject_id, subject_name FROM subjects"
+        mycursor.execute(sql)
+        subjects = mycursor.fetchall()
+        self.subjects_hash = {}
+        for id, name in subjects:
+          self.subjects_hash[id] = f'{id} / {name}'
+
+        self.menu= StringVar()
+        self.menu.set("Select Subject")
+        self.drop= OptionMenu(
             self,
-            bd=0,
-            bg="#D9D9D9",
-            highlightthickness=0,
-            state="normal",
-            textvariable=entry_text_3
-        )
-        self.entry_3.place(
+            self.menu,
+            command=lambda x:  self.display_selected(),
+            *self.subjects_hash.values()
+           )
+        self.drop.place(
             x=275.0,
             y=279.0,
             width=331.0,
@@ -233,7 +263,7 @@ class Edit_Teacher(Toplevel):
             image=entry_image_5
         )
         entry_text_5 = StringVar()
-        entry_text_5.set(self.teacher_info[5])
+        entry_text_5.set(self.teacher_info[4])
         self.entry_5 = Entry(
             self,
             bd=0,
@@ -257,7 +287,7 @@ class Edit_Teacher(Toplevel):
             image=entry_image_5
         )
         entry_text_6 = StringVar()
-        entry_text_6.set(self.teacher_info[6])
+        entry_text_6.set(self.teacher_info[5])
         self.entry_6 = Entry(
             self,
             bd=0,
@@ -331,7 +361,7 @@ class Edit_Teacher(Toplevel):
             updated_info = list()
             updated_info.append(self.entry_1.get())
             updated_info.append(self.entry_4.get())
-            updated_info.append(self.entry_3.get())
+            updated_info.append(self.subject_id)
             updated_info.append(self.entry_2.get())
             updated_info.append(self.entry_5.get())
             updated_info.append(self.entry_6.get())
@@ -359,3 +389,8 @@ class Edit_Teacher(Toplevel):
                 messagebox.showerror("Error", "Failed to update teacher's details")
         else:
             messagebox.showerror("Error", "Enter a valid email address")
+
+    def display_selected(self):
+        subject_hash_values = list(self.subjects_hash.values())
+        subject_hash_keys = list(self.subjects_hash.keys())
+        self.subject_id = subject_hash_keys[subject_hash_values.index(self.menu.get())]

@@ -29,7 +29,7 @@ class View_Asses(Toplevel):
         edit_Ass_Window(self, self.teacher_id, self.selected_rid)
 
     def openMarkAss(self):
-        mark_Ass_Window(self.teacher_id, self.selected_rid)
+        mark_Ass_Window(self.teacher_id, self.selected_rid, self.total_marks)
 
     def __init__(self, teacher_id, *args, **kwargs):
 
@@ -173,7 +173,9 @@ class View_Asses(Toplevel):
             "Name": ["Name", 50],
             "Date": ["Date", 50],
             "Short Description": ["Short Description", 100],
-            "Resource URL": ["Resource URL", 80]     
+            "Resource URL": ["Resource URL", 100],
+            "Teacher ID": ["Teacher ID", 10],
+            "Total Marks": ["Total Marks", 80]       
         }
 
         self.treeview = Treeview(
@@ -212,6 +214,7 @@ class View_Asses(Toplevel):
             self.selected_item = self.treeview.selection()[0]
             # Get the room id
             self.selected_rid = self.treeview.item(self.selected_item, "values")[0]
+            self.total_marks = self.treeview.item(self.selected_item, "values")[6]
             self.edit_btn.config(state="normal")
             self.delete_btn.config(state="normal")
             self.mark_btn.config(state="normal")
@@ -263,26 +266,4 @@ class View_Asses(Toplevel):
              self.handle_refresh()
          else:
              messagebox.showinfo("Error", "Unable to delete selected Assignment")
-
-    # def transaction_action(self, approved):
-    #     mydb = mysql.connector.connect(
-    #     host="localhost",
-    #     user="admin",
-    #     password="admin12",
-    #     database="sms"
-    #     )
-    #     mycursor = mydb.cursor()
-
-    #     query1 = "UPDATE transactions SET status = %s WHERE transaction_id = %s"
-    #     param_list1 = list()
-    #     param_list1.append(approved)
-    #     param_list1.append(self.selected_rid)
-    #     mycursor.execute(query1, param_list1)
-    #     mydb.commit()
-    #     values = self.treeview.item(self.selected_item, "values")
-    #     #values[7] = approved
-    #     values_list = list(values)
-    #     #values_list.append(*values)
-    #     values_list[7] = approved
-    #     self.treeview.item(self.selected_item, tags=[approved], values=values_list)
         

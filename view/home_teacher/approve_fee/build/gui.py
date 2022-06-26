@@ -111,7 +111,7 @@ class Approve_Std_Fee(Toplevel):
         )
 
         button_image_4 = PhotoImage(
-            file=relative_to_assets("button_4.png"))
+            file=relative_to_assets("approve.png"))
         self.approve_btn = Button(
             self.canvas,
             image=button_image_4,
@@ -124,8 +124,8 @@ class Approve_Std_Fee(Toplevel):
         self.approve_btn.place(
             x=300.0,
             y=462.0,
-            width=116.0,
-            height=48.0
+            width=100.0,
+            height=75.0
         )
 
 

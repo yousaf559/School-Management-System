@@ -1,5 +1,5 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel, StringVar, messagebox
+from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel, StringVar, messagebox, OptionMenu
 import mysql.connector
 from validate_email import validate_email
 
@@ -173,20 +173,50 @@ class Add_Teacher(Toplevel):
             height=37.0
         )
 
-        entry_image_3 = PhotoImage(
-            file=relative_to_assets("entry_3.png"))
-        entry_bg_3 = self.canvas.create_image(
-            440.5,
-            298.5,
-            image=entry_image_3
+        # entry_image_3 = PhotoImage(
+        #     file=relative_to_assets("entry_3.png"))
+        # entry_bg_3 = self.canvas.create_image(
+        #     440.5,
+        #     298.5,
+        #     image=entry_image_3
+        # )
+        # self.entry_3 = Entry(
+        #     self,
+        #     bd=0,
+        #     bg="#D9D9D9",
+        #     highlightthickness=0
+        # )
+        # self.entry_3.place(
+        #     x=275.0,
+        #     y=279.0,
+        #     width=331.0,
+        #     height=37.0
+        # )
+
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="admin",
+            password="admin12",
+            database="sms"
         )
-        self.entry_3 = Entry(
+        mycursor = mydb.cursor()
+
+        sql = "SELECT subject_id, subject_name FROM subjects"
+        mycursor.execute(sql)
+        subjects = mycursor.fetchall()
+        self.subjects_hash = {}
+        for id, name in subjects:
+          self.subjects_hash[id] = f'{id} / {name}'
+
+        self.menu= StringVar()
+        self.menu.set("Select Subject")
+        self.drop= OptionMenu(
             self,
-            bd=0,
-            bg="#D9D9D9",
-            highlightthickness=0
-        )
-        self.entry_3.place(
+            self.menu,
+            command=lambda x:  self.display_selected(),
+            *self.subjects_hash.values()
+           )
+        self.drop.place(
             x=275.0,
             y=279.0,
             width=331.0,
@@ -298,7 +328,7 @@ class Add_Teacher(Toplevel):
             new_info = list()
             new_info.append(self.entry_1.get())
             new_info.append(self.entry_4.get())
-            new_info.append(self.entry_3.get())
+            new_info.append(self.subject_id)
             new_info.append(self.entry_2.get())
             new_info.append(self.entry_5.get())
             new_info.append(self.entry_6.get())
@@ -324,3 +354,8 @@ class Add_Teacher(Toplevel):
                 messagebox.showerror("Error", "Failed to add record")
         else:
             messagebox.showerror("Error", "Enter a valid email address")
+
+    def display_selected(self):
+        subject_hash_values = list(self.subjects_hash.values())
+        subject_hash_keys = list(self.subjects_hash.keys())
+        self.subject_id = subject_hash_keys[subject_hash_values.index(self.menu.get())]
