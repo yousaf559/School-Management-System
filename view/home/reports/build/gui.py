@@ -1,6 +1,10 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel
 from tkinter.ttk import Treeview
+from tkinter import filedialog
+from view.home.reports.sugggestions.build.gui import suggestions_Window
+import pandas as pd
+import mysql.connector
 
 
 
@@ -22,7 +26,17 @@ class Reports(Toplevel):
         #homeWindow()
         self.home_manager.homeWindow()
 
+    def openSuggestions():
+        suggestions_Window()
+
     def __init__(self, manager, *args, **kwargs):
+
+        self.reports = {
+            "Order by Most Paid Teachers": "SELECT teachers.*, transactions.amount FROM teachers LEFT JOIN transactions ON transactions.teacher_id = teachers.teacher_id WHERE transactions.type = 'Salary' ORDER BY transactions.amount DESC;",
+            "Order by Highest Achieving Student" : "SELECT students.*, student_br_teacher.class_year, SUM(students_asses.grade) as total_marks FROM students LEFT JOIN students_asses ON students.student_id = students_asses.student_id LEFT JOIN student_br_teacher ON student_br_teacher.student_id = students.student_id WHERE student_br_teacher.class_year = YEAR(current_date()) GROUP BY students_asses.student_id;",
+            "Order by Student With Highest Attendance" : "SELECT students.*, COUNT(std_attendance.student_id) as total_attendance FROM students LEFT JOIN std_attendance ON std_attendance.student_id = students.student_id WHERE YEAR(std_attendance.date)=YEAR(current_date()) GROUP BY std_attendance.student_id ORDER BY COUNT(std_attendance.student_id) DESC;",
+            "Order by Teacher With Highest Attendance:" : "SELECT teachers.*, COUNT(tch_attendance.teacher_id) as total_attendance FROM teachers LEFT JOIN tch_attendance ON tch_attendance.teacher_id = teachers.teacher_id WHERE YEAR(tch_attendance.date)=YEAR(current_date()) GROUP BY tch_attendance.teacher_id ORDER BY COUNT(tch_attendance.teacher_id) DESC;"
+        }
 
         self.home_manager=manager
         Toplevel.__init__(self, *args, **kwargs)
@@ -95,7 +109,7 @@ class Reports(Toplevel):
             image=button_image_1,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("sadasdad"),
+            command=lambda: self.handle_generate(),
             relief="flat"
         )
         button_1.place(
@@ -129,7 +143,7 @@ class Reports(Toplevel):
             image=button_image_4,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("sadasdad"),
+            command=lambda: self.openSuggestions(),
             relief="flat"
         )
         button_4.place(
@@ -165,14 +179,7 @@ class Reports(Toplevel):
         # Add selection event
         self.treeview.bind("<<TreeviewSelect>>", self.on_treeview_select)
 
-        reports = [
-            "order by most paid teacher",
-            "student with highest total marks for each class",
-            "student with attendance",
-            "teacher with attendance"
-            ]
-
-        for row in reports:
+        for row in self.reports.keys():
             self.treeview.insert("", "end", values=[row])
 
         self.mainloop()
@@ -185,5 +192,19 @@ class Reports(Toplevel):
                 return
             # Get the selected item
             item = self.treeview.selection()[0]
-            # Get the room id
+            # Get the id
             self.selected_rid = self.treeview.item(item, "values")[0]
+
+    def handle_generate(self):
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="admin",
+            password="admin12",
+            database="sms"
+        )
+        self.reports[self.selected_rid]
+        sql_query = pd.read_sql_query(self.reports[self.selected_rid],mydb)
+        df = pd.DataFrame(sql_query)
+        directory = filedialog.asksaveasfilename()
+        df = pd.DataFrame(sql_query)
+        df.to_csv (directory, index = False)
