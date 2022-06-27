@@ -19,7 +19,7 @@ class Admin():
         mycursor.execute(sql)
         result = mycursor.fetchall()   
         if len(result) > 0:
-            #EmailSendingService.alert_admin()
+            EmailSendingService.alert_admin()
             return True
         else:
             messagebox.showerror("Error!", "Incorrect Credentials, Try Again!")

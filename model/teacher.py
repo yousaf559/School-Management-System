@@ -1,7 +1,6 @@
 from model.__init__ import __init__ as init_db
 import mysql.connector
 from tkinter import messagebox
-from services.email_sending_service import EmailSendingService
 from datetime import date
 
 class Teacher():
@@ -34,7 +33,6 @@ class Teacher():
             mycursor.execute(sql2, param_list)
             mydb.commit()
         if len(result) > 0:
-            #EmailSendingService.alert_admin()
             return result[0][0]
         else:
             messagebox.showerror("Error!", "Incorrect Credentials, Try Again!")
