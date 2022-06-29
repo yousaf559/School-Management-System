@@ -98,7 +98,7 @@ DEFAULT CHARACTER SET = utf8mb3;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `sms`.`students` (
   `student_id` INT NOT NULL AUTO_INCREMENT,
-  `student_name` VARCHAR(50) NOT NULL COMMENT 'Student\'s full name',
+  `student_name` VARCHAR(50) NOT NULL,
   `student_address` MEDIUMTEXT NOT NULL,
   `student_age` INT NOT NULL,
   `student_phone` VARCHAR(15) NOT NULL,
@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS `sms`.`student_br_teacher` (
   `teacher_id` INT NULL DEFAULT NULL,
   `class_name` VARCHAR(20) NULL DEFAULT NULL,
   `class_id` INT NOT NULL AUTO_INCREMENT,
-  `class_year` YEAR NOT NULL DEFAULT year(curdate()),
+  `class_year` YEAR NOT NULL DEFAULT (year(curdate())),
   PRIMARY KEY (`class_id`),
   UNIQUE INDEX `unq_t_parent_name` (`student_id` ASC, `teacher_id` ASC) VISIBLE,
   UNIQUE INDEX `unq_t_student_year` (`student_id` ASC, `class_year` ASC) VISIBLE,
