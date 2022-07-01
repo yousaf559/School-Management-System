@@ -284,7 +284,7 @@ class Mark_Ass(Toplevel):
                 mycursor.execute(sql, param_list)
                 mydb.commit()
         else:
-            messagebox.showerror("STOP RIGHT THERE CRIMINAL SCUM", "Sahi marks dal na salay")
+            messagebox.showerror("Error", "Please enter the correct marks!")
         self.refresh_table()
 
     def refresh_table(self):
