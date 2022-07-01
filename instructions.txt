@@ -1,0 +1,25 @@
+All libraries requirements are in setup folder in text file called "requirements.txt" (Use command provided).
+SQL script is also in setup folder. File name is "my_db.sql" (Use command provided).
+
+SETUP INSTRUCTIONS
+
+Pre-req:
+1. Install python3.8
+2. Install MySQL 8
+3. Install git
+4. Install pip
+
+Installation cmd commands (Use in root project directory):
+1. git clone https://github.com/yousaf559/School-Management-System.git
+2. cd School-Management-System
+3. pip install -r setup/requirements.txt
+Notes: In case of multiple python installation
+->     pip3 install -r setup/requirements.txt
+4. mysql -u <mysql-username> -p <mysql-password> < setup/my_db.sql
+Notes: username should be: admin
+       password should be: admin12
+For MacOS: mysql -u <mysql-username> -p<mysql-password> < setup/my_db.sql
+
+5. python app.py (To run program)
+Notes: In case of multiple python installation
+-> python3 app.py
